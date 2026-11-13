@@ -1,17 +1,19 @@
 import type { CSSProperties, ReactNode } from 'react';
 import type { DesignSystem, Page, SlideMeta } from '@open-slide/core';
-import { ImagePlaceholder } from '@open-slide/core';
+import { ImagePlaceholder, useSlidePageNumber } from '@open-slide/core';
 
 import logo from './assets/logo.png';
 import mascot from './assets/mascot.png';
 import mascotWorried from './assets/mascot-worried.png';
 import screenLanding from './assets/screen-landing.webp';
-import screenHome from './assets/screen-home.webp';
 import screenChat1 from './assets/screen-chat-1.webp';
 import screenChat2 from './assets/screen-chat-2.webp';
 import screenProfile from './assets/screen-profile.webp';
 import screenSelf from './assets/screen-self.webp';
-import screenGift from './assets/screen-gift.webp';
+import screenAsk from './assets/screen-ask.png';
+import screenGiftDetail from './assets/screen-gift-detail.png';
+import screenFriendsList from './assets/screen-friends-list.png';
+import screenFriendDetail from './assets/screen-friend-detail.png';
 import teamJuno from './assets/team-juno.jpg';
 import teamZayn from './assets/team-zayn.jpg';
 import teamFinn from './assets/team-finn.jpg';
@@ -22,6 +24,7 @@ import archManage from './assets/arch-manage.png';
 import archDeploy from './assets/arch-deploy.png';
 import archCicd from './assets/arch-cicd.png';
 import archMonitoring from './assets/arch-monitoring.png';
+import ga4Pages from './assets/ga4-pages.png';
 import asset from '@assets/메인페이지.png';
 import asset2 from './assets/메인페이지.png';
 import asset3 from './assets/상품상세.png';
@@ -30,6 +33,20 @@ import asset5 from './assets/나를위한 상품.p
 import asset1 from './assets/나를위한 상품-1.png';
 import asset20261112212908 from './assets/스크린샷 2026-11-12 21.29.08.png';
 import asset6 from './assets/분석전 메인페이지.png';
+import slop1 from './assets/slop-1.png';
+import slop2 from './assets/slop-2.png';
+import slop3 from './assets/slop-3.png';
+import slop4 from './assets/slop-4.png';
+import slop5 from './assets/slop-5.png';
+import slop6 from './assets/slop-6.png';
+import slop7 from './assets/slop-7.png';
+import slop8 from './assets/slop-8.png';
+import slop9 from './assets/slop-9.png';
+import collabDiscord from './assets/collab-discord.png';
+import collabKptV1 from './assets/collab-kpt-v1.png';
+import collabKptV2 from './assets/collab-kpt-v2.png';
+import collabBlog from './assets/collab-blog.png';
+import collabBlogPost from './assets/collab-blog-post.png';
 
 
 
@@ -46,7 +63,7 @@ import asset6 from './assets/분석전 메인페�
  * 니쥬(NeedU) 프로젝트 결과 보고서
  *
  * 구조: 01 팀 구성 및 역할 > 02 프로젝트 개요 > 03 프로젝트 수행 경과(사용자 흐름 A, B)
- *      > 04 프로젝트 결과 > 05 활용방안 및 기대효과 > 06 자체 평가 의견 및 후기 > 시연 > Q&A
+ *      > 04 프로젝트 결과 > 05 활용방안 및 기대효과 > 06 경쟁 서비스 비교 > Q&A
  *      > 부록 A 아키텍처, 부록 B 스택별 기술 상세 (발표에서는 넘기는 자료)
  *
  * 점선 밑줄(<Fill>)과 점선 상자(<Slot>)는 아직 채워야 하는 칸입니다.
@@ -99,8 +116,12 @@ if (typeof document !== 'undefined') {
 
 /* ───────────────────────── Shared components ───────────────────────── */
 
-const Slide = ({ children, bg }: { children: ReactNode; bg?: string }) => (
+const Slide = ({ children, bg }: { children: ReactNode; bg?: string }) => {
+  const { current } = useSlidePageNumber();
+  const isMain = current <= pages.indexOf(AppendixArch);
+  return (
   <div
+    className={isMain ? 'needu-report-main' : undefined}
     style={{
       width: '100%',
       height: '100%',
@@ -113,9 +134,15 @@ const Slide = ({ children, bg }: { children: ReactNode; bg?: string }) => (
       wordBreak: 'keep-all',
     }}
   >
+    {isMain ? <style>{`
+      .needu-report-main div { box-shadow: none !important; }
+      .needu-report-main div[style*="border-radius"]:not([style*="border-radius: 50%"]) { border-color: transparent !important; }
+      .needu-report-main div[style*="gradient"] { background-image: none !important; background-color: var(--osd-accent); }
+    `}</style> : null}
     {children}
   </div>
-);
+  );
+};
 
 const Circle = ({ size, left, top, color }: { size: number; left: number; top: number; color?: string }) => (
   <div
@@ -189,14 +216,7 @@ const H = ({ size, children, style }: { size: number; children: ReactNode; style
 
 const P = ({ size, children, style }: { size?: number; children: ReactNode; style?: CSSProperties }) => (
   <p
-    style={{
-      fontSize: size ?? 'var(--osd-size-body)',
-      lineHeight: 1.5,
-      margin: 0,
-      color: muted,
-      fontWeight: 500,
-      ...style,
-    }}
+    style={{ fontSize: size ?? 'var(--osd-size-body)', lineHeight: 1.5, margin: 0, color: muted, fontWeight: 500, ...style, translate: '0px 1px' }}
   >
     {children}
   </p>
@@ -358,9 +378,9 @@ const TagBox = ({
 
 /* ───────────────────────── Chapter divider ───────────────────────── */
 
-const SubItem = ({ n, children }: { n: string; children: ReactNode }) => (
+const SubItem = ({ n, children }: { n?: string; children: ReactNode }) => (
   <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-    <Num n={n} dark />
+    {n ? <Num n={n} dark /> : null}
     <span style={{ fontSize: 32, fontWeight: 700 }}>{children}</span>
   </div>
 );
@@ -411,23 +431,41 @@ const Divider = ({ n, title, children, character }: { n: string; title: ReactNod
 const slopOrange = '#F59E0B';
 const slopInk = '#2B2B2B';
 const slopMuted = '#8A8070';
-const slopGradText: CSSProperties = {
-  backgroundImage: 'linear-gradient(90deg, #F7C21A 0%, #FF9F1C 100%)',
-  WebkitBackgroundClip: 'text',
-  backgroundClip: 'text',
-  color: 'transparent',
-};
+/* PDF 내보내기는 CSS 그라데이션(background-image의 *-gradient)과 box-shadow를 지운다.
+ * 그래서 그라데이션 면은 SVG 이미지(url)로 그리고, 그림자·글자 그림자·필터는 쓰지 않는다. */
+const svgBg = (svg: string) => `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+const linGrad = (from: string, to: string, diag = false, fromAt = 0) =>
+  svgBg(
+    `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1' preserveAspectRatio='none'><linearGradient id='g' x2='1' y2='${diag ? 1 : 0}'><stop offset='${fromAt}' stop-color='${from}'/><stop offset='1' stop-color='${to}'/></linearGradient><rect width='1' height='1' fill='url(#g)'/></svg>`,
+  );
+const gradFill = (from: string, to: string, diag = false): CSSProperties => ({
+  backgroundColor: to,
+  backgroundImage: linGrad(from, to, diag),
+  backgroundSize: '100% 100%',
+});
+/* background-clip: text는 PDF에서 배경이 글자 밖으로 새거나 상자로 칠해지므로 그라데이션 글자는 단색으로 둔다. */
+const gradText = (color: string): CSSProperties => ({ color });
+const slopBg = svgBg(
+  "<svg xmlns='http://www.w3.org/2000/svg' width='1920' height='1080' viewBox='0 0 1920 1080'><defs>" +
+    "<radialGradient id='a' gradientUnits='userSpaceOnUse' cx='192' cy='130' r='750'><stop offset='0' stop-color='#FFD600' stop-opacity='0.42'/><stop offset='1' stop-color='#FFD600' stop-opacity='0'/></radialGradient>" +
+    "<radialGradient id='b' gradientUnits='userSpaceOnUse' cx='1766' cy='950' r='842'><stop offset='0' stop-color='#FFA03C' stop-opacity='0.32'/><stop offset='1' stop-color='#FFA03C' stop-opacity='0'/></radialGradient>" +
+    "<pattern id='p' width='80' height='80' patternUnits='userSpaceOnUse'><rect width='80' height='1' fill='#BEA050' fill-opacity='0.08'/><rect width='1' height='80' fill='#BEA050' fill-opacity='0.08'/></pattern>" +
+    "</defs><rect width='1920' height='1080' fill='url(#a)'/><rect width='1920' height='1080' fill='url(#b)'/><rect width='1920' height='1080' fill='url(#p)'/></svg>",
+);
+/* 형광펜: 글자 아래 42%만 노랗게 */
+const markBg = svgBg(
+  "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1' preserveAspectRatio='none'><rect y='0.58' width='1' height='0.42' fill='#FEE500'/></svg>",
+);
+const slopGradText = gradText('#F5A01C');
 const slopGlass: CSSProperties = {
   background: 'rgba(255,255,255,0.72)',
   border: '2px solid rgba(255,255,255,0.95)',
   borderRadius: 32,
-  boxShadow: '0 24px 60px rgba(245,158,11,0.14), inset 0 1px 0 rgba(255,255,255,0.9)',
-  backdropFilter: 'blur(14px)',
   boxSizing: 'border-box',
 };
 
 const Sparkle = ({ left, top, size }: { left: number; top: number; size: number }) => (
-  <span style={{ position: 'absolute', left, top, fontSize: size, lineHeight: 1, color: '#F5B800', textShadow: '0 0 18px rgba(255,200,0,0.6)' }}>✦</span>
+  <span style={{ position: 'absolute', left, top, fontSize: size, lineHeight: 1, color: '#F5B800' }}>✦</span>
 );
 
 const SlopSlide = ({ children }: { children: ReactNode }) => (
@@ -441,13 +479,8 @@ const SlopSlide = ({ children }: { children: ReactNode }) => (
       fontFamily: 'var(--osd-font-body)',
       wordBreak: 'keep-all',
       backgroundColor: '#FFF8E8',
-      backgroundImage: [
-        'radial-gradient(circle at 10% 12%, rgba(255,214,0,0.42), transparent 38%)',
-        'radial-gradient(circle at 92% 88%, rgba(255,160,60,0.32), transparent 42%)',
-        'linear-gradient(rgba(190,160,80,0.08) 1px, transparent 1px)',
-        'linear-gradient(90deg, rgba(190,160,80,0.08) 1px, transparent 1px)',
-      ].join(', '),
-      backgroundSize: '100% 100%, 100% 100%, 80px 80px, 80px 80px',
+      backgroundImage: slopBg,
+      backgroundSize: '100% 100%',
     }}
   >
     <div style={{ position: 'absolute', right: 120, top: 54, fontSize: 22, fontWeight: 700, color: slopMuted }}>
@@ -498,7 +531,7 @@ const Cover: Page = () => (
     </Box>
     <Box left={112} top={250}>
       <div style={{ fontSize: 230, fontWeight: 800, fontFamily: 'var(--osd-font-display)', letterSpacing: '-0.05em', lineHeight: 1 }}>
-        <span style={{ backgroundImage: 'linear-gradient(90deg, #151515 30%, #6B5A3A 100%)', WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent' }}>Need</span>
+        <span style={gradText('#151515')}>Need</span>
         <span style={slopGradText}>U</span>
       </div>
     </Box>
@@ -522,8 +555,7 @@ const Cover: Page = () => (
         style={{
           padding: '26px 44px',
           borderRadius: 999,
-          background: 'linear-gradient(90deg, #F7D33A 0%, #FFB020 100%)',
-          boxShadow: '0 18px 40px rgba(255,170,30,0.45)',
+          ...gradFill('#F7D33A', '#FFB020'),
           fontSize: 30,
           fontWeight: 800,
           whiteSpace: 'nowrap',
@@ -533,7 +565,7 @@ const Cover: Page = () => (
       </span>
       <div>
         <div style={{ fontSize: 26, fontWeight: 700, color: slopMuted }}>💡 Team 4주라 · 카카오테크 부트캠프</div>
-        <div style={{ fontSize: 20, fontWeight: 600, color: slopMuted, marginTop: 8 }}>이름 · 이름 · 이름 · 이름 · 이름 · 이름</div>
+        <div style={{ fontSize: 20, fontWeight: 600, color: slopMuted, marginTop: 8 }}>juno, zayn,finn,lewis,cindy, mond</div>
       </div>
     </Box>
     <div style={{ ...slopGlass, position: 'absolute', left: 1260, top: 250, width: 540, padding: '44px 44px 36px' }}>
@@ -543,7 +575,7 @@ const Cover: Page = () => (
             width: 64,
             height: 64,
             borderRadius: 18,
-            background: 'linear-gradient(135deg, #FFE066, #FFB020)',
+            ...gradFill('#FFE066', '#FFB020', true),
             display: 'inline-flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -558,7 +590,7 @@ const Cover: Page = () => (
         </div>
       </div>
       <div style={{ height: 12, borderRadius: 6, background: 'rgba(0,0,0,0.06)', marginTop: 40 }}>
-        <div style={{ width: '98%', height: '100%', borderRadius: 6, background: 'linear-gradient(90deg, #F7C21A, #FF9F1C)' }} />
+        <div style={{ width: '98%', height: '100%', borderRadius: 6, ...gradFill('#F7C21A', '#FF9F1C') }} />
       </div>
       <div style={{ marginTop: 22 }}>
         <SlopMetric label="🎯 취향 정확도" value="98.7%" />
@@ -579,7 +611,7 @@ const SlopTocCard = ({ icon, n, title, sub }: { icon: string; n: string; title: 
         width: 76,
         height: 76,
         borderRadius: 20,
-        background: 'linear-gradient(135deg, #FFF1B8, #FFD873)',
+        ...gradFill('#FFF1B8', '#FFD873', true),
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -614,7 +646,7 @@ const Contents: Page = () => (
       <SlopTocCard icon="📈" n="03" title="프로젝트 수행 경과" sub="애자일한 혁신의 여정" />
       <SlopTocCard icon="🏆" n="04" title="프로젝트 결과" sub="임팩트 있는 성과와 지표" />
       <SlopTocCard icon="🌍" n="05" title="활용방안 및 기대효과" sub="무한한 가능성의 확장" />
-      <SlopTocCard icon="💭" n="06" title="자체 평가 의견 및 후기" sub="성장과 배움의 순간들" />
+      <SlopTocCard icon="🔍" n="06" title="경쟁 서비스 비교" sub="니쥬만의 차별점" />
     </Box>
     <div
       style={{
@@ -625,8 +657,7 @@ const Contents: Page = () => (
         height: 128,
         boxSizing: 'border-box',
         borderRadius: 32,
-        background: 'linear-gradient(90deg, #F7D33A 0%, #FFB020 100%)',
-        boxShadow: '0 24px 50px rgba(255,170,30,0.35)',
+        ...gradFill('#F7D33A', '#FFB020'),
         display: 'flex',
         alignItems: 'center',
         gap: 24,
@@ -654,8 +685,7 @@ const Ch01: Page = () => (
         width: 400,
         height: 400,
         borderRadius: '50%',
-        background: 'linear-gradient(135deg, #FBE04A 0%, #FFB020 100%)',
-        boxShadow: '0 0 80px rgba(255,200,40,0.6), 0 30px 60px rgba(255,160,30,0.3)',
+        ...gradFill('#FBE04A', '#FFB020', true),
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -667,10 +697,7 @@ const Ch01: Page = () => (
           fontWeight: 800,
           fontFamily: 'var(--osd-font-display)',
           letterSpacing: '-0.04em',
-          backgroundImage: 'linear-gradient(135deg, #151515 40%, #6B5A3A 100%)',
-          WebkitBackgroundClip: 'text',
-          backgroundClip: 'text',
-          color: 'transparent',
+          ...gradText('#151515'),
         }}
       >
         01
@@ -711,8 +738,7 @@ const SlopMember = ({
           zIndex: 2,
           padding: '8px 20px',
           borderRadius: 999,
-          background: 'linear-gradient(90deg, #F7D33A, #FFB020)',
-          boxShadow: '0 10px 24px rgba(255,170,30,0.45)',
+          ...gradFill('#F7D33A', '#FFB020'),
           fontSize: 20,
           fontWeight: 800,
           whiteSpace: 'nowrap',
@@ -726,8 +752,7 @@ const SlopMember = ({
         position: 'relative',
         borderRadius: 22,
         padding: 4,
-        background: 'linear-gradient(135deg, #FFE066, #FF9F1C)',
-        boxShadow: '0 12px 30px rgba(255,170,30,0.35)',
+        ...gradFill('#FFE066', '#FF9F1C', true),
       }}
     >
       <img src={photo} alt="" style={{ display: 'block', width: '100%', aspectRatio: '1 / 1', objectFit: 'cover', borderRadius: 18 }} />
@@ -803,11 +828,23 @@ const Ch02: Page = () => (
 );
 
 /* 똑같은 결과물 사이에서 하나만 다른 칸 */
-const SameTile = () => (
-  <div style={{ width: 180, height: 180, borderRadius: 32, background: surface, border: `2px solid ${line}`, boxSizing: 'border-box', padding: 30 }}>
-    <div style={{ width: 70, height: 14, borderRadius: 7, background: line }} />
-    <div style={{ width: 110, height: 14, borderRadius: 7, background: line, marginTop: 14 }} />
-    <div style={{ width: 90, height: 14, borderRadius: 7, background: line, marginTop: 14 }} />
+const SlopCard = ({ src, left, top, w, h, rotate }: { src: string; left: number; top: number; w: number; h: number; rotate: number }) => (
+  <div
+    style={{
+      position: 'absolute',
+      left,
+      top,
+      width: w,
+      height: h,
+      padding: 8,
+      boxSizing: 'border-box',
+      background: '#FFFFFF',
+      borderRadius: 18,
+      boxShadow: '0 10px 30px rgba(0,0,0,0.14)',
+      rotate: `${rotate}deg`,
+    }}
+  >
+    <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 12, filter: 'saturate(0.7)', display: 'block' }} />
   </div>
 );
 
@@ -832,21 +869,32 @@ const Era: Page = () => (
         명확히 이해하거나 표현하는 데 어려움을 겪습니다.
       </P>
     </Box>
-    <Box left={1180} top={230} width={600} style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 180px)', gap: 30 }}>
-      <SameTile />
-      <SameTile />
-      <SameTile />
-      <SameTile />
-      <div style={{ width: 180, height: 180, borderRadius: 32, background: 'var(--osd-accent)', position: 'relative' }}>
-        <img src={mascot} alt="" style={{ position: 'absolute', left: -20, top: -30, width: 220, translate: '20px 35px' }} />
-      </div>
-      <SameTile />
-      <SameTile />
-      <SameTile />
-      <SameTile />
-    </Box>
-    <Box left={1180} top={890} width={600} style={{ textAlign: 'center' }}>
-      <P size={28} style={{ color: 'var(--osd-text)', fontWeight: 700 }}>같은 도구, 다른 취향</P>
+    <SlopCard src={slop3} left={1130} top={110} w={300} h={160} rotate={-5} />
+    <SlopCard src={slop1} left={1450} top={92} w={210} h={150} rotate={4} />
+    <SlopCard src={slop4} left={1665} top={150} w={160} h={210} rotate={7} />
+    <SlopCard src={slop6} left={1150} top={330} w={160} h={280} rotate={-3} />
+    <SlopCard src={slop7} left={1665} top={400} w={150} h={260} rotate={5} />
+    <SlopCard src={slop2} left={1125} top={690} w={200} h={200} rotate={4} />
+    <SlopCard src={slop8} left={1355} top={730} w={180} h={235} rotate={-4} />
+    <SlopCard src={slop9} left={1555} top={700} w={165} h={215} rotate={3} />
+    <SlopCard src={slop5} left={1700} top={735} w={135} h={200} rotate={-6} />
+    <div
+      style={{
+        position: 'absolute',
+        left: 1380,
+        top: 390,
+        width: 230,
+        height: 230,
+        borderRadius: 40,
+        background: 'var(--osd-accent)',
+        boxShadow: '0 24px 60px rgba(0,0,0,0.25)',
+        zIndex: 5,
+      }}
+    >
+      <img src={mascotWorried} alt="" style={{ position: 'absolute', left: 5, top: 5, width: 240, objectFit: 'cover' }} />
+    </div>
+    <Box left={1355} top={640} width={280} style={{ textAlign: 'center', zIndex: 6 }}>
+      <span style={{ display: 'inline-block', padding: '8px 22px', borderRadius: 999, background: 'var(--osd-text)', color: '#FFFFFF', fontSize: 24, fontWeight: 700 }}>같은 도구, 같은 내용</span>
     </Box>
   </Slide>
 );
@@ -1047,24 +1095,24 @@ const Ch03: Page = () => (
     title={<>프로젝트<br />수행 경과</>}
     character={<img src={mascot} alt="" style={{ position: 'absolute', left: 820, top: 330, width: 240, rotate: '-12deg' }} />}
   >
-    <SubItem n="A">나의 취향을 찾고 상품까지</SubItem>
-    <SubItem n="B">친구 선물과 슬쩍 물어보기</SubItem>
+    <SubItem>나의 취향을 찾고 상품까지</SubItem>
+    <SubItem>친구 선물과 슬쩍 물어보기</SubItem>
   </Divider>
 );
 
-const FLOW_A = ['메인 페이지', 'AI 채팅', '취향 분석', '상품 목록', '상품 상세', '구매 여부', '메인 페이지 알림'];
-const FLOW_B = ['친구 조회', '상품 목록', '상품 상세', '슬쩍 물어보기', '메인 페이지 알림'];
+const FLOW_A = ['메인 페이지', 'AI 채팅', '취향 분석', '상품 목록', '상품 상세', '메인 페이지 알림'];
+const FLOW_B = ['친구 조회', '상품 목록', '상품 상세', '슬쩍 물어보기'];
 
-/** 화면 하단 흐름 막대: 지금 화면이 흐름의 몇 번째인지 보여 줍니다. */
+/** 화면 상단 흐름 막대: 지금 화면이 흐름의 몇 번째인지 보여 줍니다. */
 const FlowBar = ({ flow, current }: { flow: 'A' | 'B'; current: number }) => {
   const steps = flow === 'A' ? FLOW_A : FLOW_B;
   return (
-    <div style={{ position: 'absolute', left: 120, top: 966, display: 'flex', alignItems: 'center', gap: 10 }}>
+    <div style={{ position: 'absolute', left: 120, top: 100, display: 'flex', alignItems: 'center', gap: 10 }}>
       <span
         style={{
-          width: 46,
+          padding: '0 18px',
           height: 46,
-          borderRadius: '50%',
+          borderRadius: 999,
           background: 'var(--osd-text)',
           color: '#FFFFFF',
           display: 'inline-flex',
@@ -1074,9 +1122,10 @@ const FlowBar = ({ flow, current }: { flow: 'A' | 'B'; current: number }) => {
           fontWeight: 800,
           fontFamily: 'var(--osd-font-display)',
           marginRight: 8,
+          whiteSpace: 'nowrap',
         }}
       >
-        {flow}
+        주노의 니쥬 이용 동선
       </span>
       {steps.map((s, i) => (
         <span key={s + i} style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}>
@@ -1148,60 +1197,60 @@ const FlowIntroA: Page = () => (
     <FlowThumb left={120} top={370} width={200} n="1" label="메인 페이지">
       <img src={asset6} alt="" style={screenImg(18)} />
     </FlowThumb>
-    <FlowThumbArrow left={322} top={555} />
-    <FlowThumb left={364} top={370} width={200} n="2" label="AI 채팅">
+    <FlowThumbArrow left={364} top={555} />
+    <FlowThumb left={416} top={370} width={200} n="2" label="AI 채팅">
       <img src={screenChat1} alt="" style={screenImg(18)} />
     </FlowThumb>
-    <FlowThumbArrow left={566} top={555} />
-    <FlowThumb left={608} top={370} width={200} n="3" label="취향 분석">
+    <FlowThumbArrow left={660} top={555} />
+    <FlowThumb left={712} top={370} width={200} n="3" label="취향 분석">
       <img src={screenProfile} alt="" style={screenImg(18)} />
     </FlowThumb>
-    <FlowThumbArrow src={asset5} left={810} top={555} />
-    <FlowThumb left={852} top={370} width={200} n="4" label="상품 목록">
+    <FlowThumbArrow src={asset5} left={956} top={555} />
+    <FlowThumb left={1008} top={370} width={200} n="4" label="상품 목록">
       <img src={asset1} alt="" style={screenImg(18)} />
     </FlowThumb>
-    <FlowThumbArrow left={1054} top={555} />
-    <FlowThumb left={1096} top={370} width={200} n="5" label="상품 상세">
+    <FlowThumbArrow left={1252} top={555} />
+    <FlowThumb left={1304} top={370} width={200} n="5" label="상품 상세">
       <img src={asset3} alt='상품 상세 화면' style={{ display: 'block', width: 180, height: 376, borderRadius: 18, objectFit: 'cover', objectPosition: '50% 50%', objectViewBox: 'inset(0% 0% 17.36% 0%)' }} />
     </FlowThumb>
-    <FlowThumbArrow left={1298} top={555} />
-    <FlowThumb left={1340} top={370} width={200} n="6" label="구매 여부">
-      <ImagePlaceholder hint="구매 여부 확인 화면" width={180} height={376} style={{ borderRadius: 18, background: surface }} />
-    </FlowThumb>
-    <FlowThumbArrow src={asset4} left={1542} top={555} style={{ objectFit: 'cover', objectPosition: '50% 50%', objectViewBox: 'inset(0% 0% 17.36% 0%)', translate: '0px 0px' }} />
-    <FlowThumb left={1584} top={370} width={200} n="7" label="메인 페이지 알림">
+    <FlowThumbArrow left={1548} top={555} />
+    <FlowThumb left={1600} top={370} width={200} n="6" label="메인 페이지 알림">
       <img src={asset4} alt='메인 페이지 알림 화면' style={{ display: 'block', width: 180, height: 376, borderRadius: 18, objectFit: 'cover', objectPosition: '50% 50%', objectViewBox: 'inset(0% 0% 17.36% 0%)' }} />
     </FlowThumb>
   </Slide>
 );
 
+const thumbCover = (radius: number): CSSProperties => ({
+  display: 'block',
+  width: '100%',
+  aspectRatio: '860 / 1794',
+  objectFit: 'cover',
+  objectPosition: '50% 0%',
+  borderRadius: radius,
+  background: surface,
+});
+
 const FlowIntroB: Page = () => (
   <Slide>
-    <Head chapter="03 프로젝트 수행 경과" width={1400}>
-      흐름 B 친구 선물과 슬쩍 물어보기
-    </Head>
+    <Head chapter="03 프로젝트 수행 경과" width={1400}>친구 선물과 슬쩍 물어보기</Head>
     <Box left={120} top={260} width={1400}>
       <P>친구의 취향으로 선물을 고르고, 망설여지면 익명으로 슬쩍 물어보는 흐름입니다.</P>
     </Box>
     <img src={mascotWorried} alt="" style={{ position: 'absolute', left: 1560, top: 90, width: 250 }} />
-    <FlowThumb left={160} top={370} width={220} n="1" label="친구 조회">
-      <ImagePlaceholder hint="친구 조회 화면" width={200} height={417} style={{ borderRadius: 20, background: surface }} />
+    <FlowThumb left={340} top={370} width={220} n="1" label="친구 조회">
+      <img src={screenFriendsList} alt="친구 조회 화면" style={thumbCover(20)} />
     </FlowThumb>
-    <FlowThumbArrow left={422} top={580} />
-    <FlowThumb left={502} top={370} width={220} n="2" label="상품 목록">
-      <img src={screenGift} alt="" style={screenImg(20)} />
+    <FlowThumbArrow left={600} top={580} />
+    <FlowThumb left={680} top={370} width={220} n="2" label="상품 목록">
+      <img src={screenFriendDetail} alt="친구 상세 화면" style={thumbCover(20)} />
     </FlowThumb>
-    <FlowThumbArrow left={764} top={580} />
-    <FlowThumb left={844} top={370} width={220} n="3" label="상품 상세">
-      <ImagePlaceholder hint="상품 상세 화면" width={200} height={417} style={{ borderRadius: 20, background: surface }} />
+    <FlowThumbArrow left={940} top={580} />
+    <FlowThumb left={1020} top={370} width={220} n="3" label="상품 상세">
+      <img src={screenGiftDetail} alt="상품 상세 화면" style={thumbCover(20)} />
     </FlowThumb>
-    <FlowThumbArrow left={1106} top={580} />
-    <FlowThumb left={1186} top={370} width={220} n="4" label="슬쩍 물어보기">
-      <ImagePlaceholder hint="슬쩍 물어보기 화면" width={200} height={417} style={{ borderRadius: 20, background: surface }} />
-    </FlowThumb>
-    <FlowThumbArrow left={1448} top={580} />
-    <FlowThumb left={1528} top={370} width={220} n="5" label="메인 페이지 알림">
-      <ImagePlaceholder hint="메인 페이지 알림 화면" width={200} height={417} style={{ borderRadius: 20, background: surface }} />
+    <FlowThumbArrow left={1280} top={580} />
+    <FlowThumb left={1360} top={370} width={220} n="4" label="슬쩍 물어보기">
+      <img src={screenAsk} alt="슬쩍 물어보기 화면" style={thumbCover(20)} />
     </FlowThumb>
   </Slide>
 );
@@ -1299,26 +1348,10 @@ const Relay = ({ relay, stack }: { relay: Stack[]; stack: Stack }) => {
   );
 };
 
-const StackHead = ({ step, stack, relay, eyebrow, children }: { step: string; stack: Stack; relay?: Stack[]; eyebrow?: ReactNode; children: ReactNode }) => (
+const StackHead = ({ step, eyebrow, children }: { step: string; stack: Stack; relay?: Stack[]; eyebrow?: ReactNode; children: ReactNode }) => (
   <Box left={120} top={100} width={1680}>
-    <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-      <Eyebrow>{eyebrow ?? <>흐름 A {step}</>}</Eyebrow>
-      {relay ? <Relay relay={relay} stack={stack} /> : null}
-    </div>
-    <div style={{ display: 'flex', alignItems: 'center', gap: 22, marginTop: 22 }}>
-      <span
-        style={{
-          padding: '6px 18px',
-          borderRadius: 14,
-          background: 'var(--osd-text)',
-          color: '#FFFFFF',
-          fontSize: 28,
-          fontWeight: 800,
-          fontFamily: 'var(--osd-font-display)',
-        }}
-      >
-        {stack}
-      </span>
+    <div style={{ height: 46 }}>{eyebrow ? <Eyebrow>{eyebrow}</Eyebrow> : null}</div>
+    <div style={{ marginTop: 22 }}>
       <H size={56}>{children}</H>
     </div>
   </Box>
@@ -1377,7 +1410,7 @@ const FeBlock = ({
   height: number;
   n: string;
   title: ReactNode;
-  problem: ReactNode;
+  problem?: ReactNode;
   children: ReactNode;
 }) => (
   <div
@@ -1396,23 +1429,25 @@ const FeBlock = ({
     }}
   >
     <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
-      <Num n={n} dark />
+      {n ? <Num n={n} dark /> : null}
       <span style={{ fontSize: 32, fontWeight: 800 }}>{title}</span>
     </div>
-    <div style={{ display: 'flex', gap: 14, marginTop: 16, fontSize: 23, fontWeight: 500, color: muted, lineHeight: 1.45 }}>
-      <ProblemTag />
-      <span>{problem}</span>
-    </div>
-    <div style={{ display: 'grid', gap: 12, marginTop: 'auto' }}>{children}</div>
+    {problem ? (
+      <div style={{ display: 'flex', gap: 14, marginTop: 16, fontSize: 23, fontWeight: 500, color: muted, lineHeight: 1.45 }}>
+        <ProblemTag />
+        <span>{problem}</span>
+      </div>
+    ) : null}
+    <div style={{ display: 'grid', gap: 12, marginTop: problem ? 'auto' : 28 }}>{children}</div>
   </div>
 );
 
 /* ── 메인 페이지 1: 폰트 ── */
 
-const FeRow = ({ n, title, sub, delta, hot }: { n: string; title: ReactNode; sub: ReactNode; delta: ReactNode; hot?: boolean }) => (
+const FeRow = ({ n, title, sub, delta, hot }: { n: string; title: ReactNode; sub?: ReactNode; delta?: ReactNode; hot?: boolean }) => (
   <div
     style={{
-      height: 104,
+      height: sub ? 104 : 76,
       ...card,
       borderRadius: 28,
       border: hot ? '2.5px solid var(--osd-text)' : card.border,
@@ -1427,9 +1462,19 @@ const FeRow = ({ n, title, sub, delta, hot }: { n: string; title: ReactNode; sub
     <Num n={n} dark={hot} />
     <div>
       <div style={{ fontSize: 28, fontWeight: 800 }}>{title}</div>
-      <div style={{ fontSize: 21, fontWeight: 500, color: muted, marginTop: 4 }}>{sub}</div>
+      {sub ? <div style={{ fontSize: 21, fontWeight: 500, color: muted, marginTop: 4 }}>{sub}</div> : null}
     </div>
     {delta}
+  </div>
+);
+
+const FontResult = ({ label, value, badge }: { label: string; value: string; badge: string }) => (
+  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 70, padding: '0 8px 0 32px', borderLeft: '2px solid rgba(21,21,21,0.25)' }}>
+    <div>
+      <div style={{ fontSize: 20, fontWeight: 700 }}>{label}</div>
+      <div style={{ fontSize: 40, fontWeight: 800, lineHeight: 1.1, fontFamily: 'var(--osd-font-display)', letterSpacing: track.display }}>{value}</div>
+    </div>
+    <span style={{ padding: '4px 14px', borderRadius: 999, background: 'var(--osd-text)', color: '#FFFFFF', fontSize: 20, fontWeight: 800 }}>{badge}</span>
   </div>
 );
 
@@ -1471,14 +1516,35 @@ const FeMainFont: Page = () => (
         </div>
       </div>
     </div>
-    <Box left={600} top={460} width={1200} style={{ display: 'grid', gap: 16 }}>
-      <FeRow n="1" title="TTF를 woff2로 변환" sub="카카오폰트 파일 용량 41% 감소" delta={<FeDelta from="995kB" to="585kB" />} />
-      <FeRow hot n="2" title="폰트 CSS 분리, 비차단 로딩" sub="헤더 표시 시간, 공통 CSS 30kB → 8kB" delta={<FeDelta from="2.38초" to="1.37초" />} />
-      <FeRow hot n="3" title="글자 범위별 분할 (unicode-range)" sub="안내 문구 표시 시간, 화면에 쓰인 글자 조각만 받음" delta={<FeDelta from="6.01초" to="4.37초" />} />
-      <FeRow n="4" title="폰트 로더를 body 끝으로 이동" sub="앱 JS 요청이 기다리던 시간" delta={<FeDelta from="약 0.7초" to="해소" />} />
+    <Box left={600} top={460} width={1200} style={{ display: 'grid', gap: 14 }}>
+      <FeRow n="1" title="TTF를 woff2로 변환" />
+      <FeRow hot n="2" title="폰트 CSS 분리, 비차단 로딩" />
+      <FeRow hot n="3" title="글자 범위별 분할 (unicode-range)" />
+      <FeRow n="4" title="폰트 로더를 body 끝으로 이동" />
     </Box>
-    <FeLink fx={0.66} fy={0.026} x2={600} y2={632} />
-    <FeLink fx={0.37} fy={0.083} x2={600} y2={752} />
+    <div
+      style={{
+        position: 'absolute',
+        left: 600,
+        top: 826,
+        width: 1200,
+        height: 110,
+        boxSizing: 'border-box',
+        borderRadius: 28,
+        background: 'var(--osd-accent)',
+        border: '2.5px solid var(--osd-text)',
+        padding: '0 36px',
+        display: 'grid',
+        gridTemplateColumns: '230px 1fr 1fr',
+        alignItems: 'center',
+      }}
+    >
+      <span style={{ fontSize: 30, fontWeight: 800 }}>개선 후 성능</span>
+      <FontResult label="안내 문구" value="0.99초" badge="−83%" />
+      <FontResult label="상품 사진" value="1.95초" badge="−73%" />
+    </div>
+    <FeLink fx={0.66} fy={0.026} x2={600} y2={588} />
+    <FeLink fx={0.37} fy={0.083} x2={600} y2={678} />
     <FeHot fx={0.66} fy={0.026} />
     <FeHot fx={0.37} fy={0.083} />
     <FlowBar flow="A" current={0} />
@@ -1496,7 +1562,6 @@ const FeMainLoad: Page = () => (
       height={312}
       n="1"
       title="GA 스크립트 지연 로딩"
-      problem={<>폰트를 고친 뒤에도 콘텐츠가 늦었습니다. 페이지뷰만 모으는 GA 스크립트(180kB)가<br />앱 JS 대역폭의 34%를 차지해 화면 표시와 데이터 요청을 늦췄습니다.</>}
     >
       <FeGain>GA 스크립트를 페이지 로드 후에 불러오도록 변경</FeGain>
       <FeGain>초기화 코드는 먼저 실행해 페이지뷰 수집은 그대로 유지</FeGain>
@@ -1506,7 +1571,6 @@ const FeMainLoad: Page = () => (
       height={322}
       n="2"
       title="상품 이미지 로딩 개선"
-      problem={<>이미지가 CSS 배경이라 CSS를 다 받을 때까지 약 1초간 요청이 시작되지 않았고,<br />약 100px 카드에 350px 이미지를 받고 있었습니다.</>}
     >
       <FeGain delta={<FeDelta from="1.0초 대기" to="0초" />}>next/image로 바꾸고 즉시, 높은 우선순위로 요청</FeGain>
       <FeGain delta={<FeDelta from="51kB" to="29kB" />}>썸네일 요청 350px → 240px (3장 합계 −43%)</FeGain>
@@ -1525,7 +1589,7 @@ const TypingDot = ({ dark }: { dark?: boolean }) => (
 
 const FeChat: Page = () => (
   <Slide>
-    <StackHead step="AI 채팅" stack="FE" relay={RELAY_CHAT}>기계처럼 보이지 않게, 기다림은 보이게</StackHead>
+    <StackHead step="AI 채팅" stack="FE" relay={RELAY_CHAT}>“AI 응답이 너무 빠르게 떠서 기계적으로 느껴져요;”</StackHead>
     <FePhone src={screenChat1} ar={AR_OLD} />
     <div
       style={{
@@ -1548,30 +1612,11 @@ const FeChat: Page = () => (
       <TypingDot dark />
       <TypingDot />
     </div>
-    <div
-      style={{
-        position: 'absolute',
-        left: 600,
-        top: 268,
-        width: 1200,
-        height: 80,
-        boxSizing: 'border-box',
-        borderRadius: 28,
-        background: softYellow,
-        padding: '0 36px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 22,
-      }}
-    >
-      <span style={{ padding: '4px 14px', borderRadius: 999, background: 'var(--osd-text)', color: '#FFFFFF', fontSize: 20, fontWeight: 800 }}>사용자 피드백</span>
-      <span style={{ fontSize: 30, fontWeight: 800 }}>“AI 응답이 너무 빠르게 떠서 기계적으로 느껴져요”</span>
-    </div>
-    <FeBlock top={366} height={280} n="1" title="AI 응답 타이핑 효과" problem="AI 응답이 한 번에 화면에 떠서 기계적으로 느껴졌습니다.">
+    <FeBlock top={366} height={280} n="1" title="AI 응답 타이핑 효과">
       <FeGain delta={<FeDelta from="한 번에" to="50ms 간격" />}>스트리밍(SSE) 응답을 단어 단위로 나눠 순서대로 표시</FeGain>
       <FeGain>응답 완료, 오류, 재연결 상황에서도 표시가 꼬이지 않게 상태 처리</FeGain>
     </FeBlock>
-    <FeBlock top={664} height={280} n="2" title="응답 대기 중 입력 표시" problem="AI 응답을 기다리는 동안 처리 중인지 확인하기 어려웠습니다.">
+    <FeBlock top={664} height={280} n="2" title="응답 대기 중 입력 표시">
       <FeGain>대기 중 “입력 중” 말풍선과 차례로 움직이는 점 애니메이션</FeGain>
       <FeGain>화면 낭독기 안내와 움직임 줄이기 설정 대응</FeGain>
     </FeBlock>
@@ -1587,19 +1632,18 @@ const FeChat: Page = () => (
 
 const FeListQuery: Page = () => (
   <Slide>
-    <StackHead step="상품 목록" stack="FE" relay={RELAY_LIST}>조건을 바꿔도 목록이 비지 않습니다</StackHead>
+    <StackHead step="상품 목록" stack="FE" relay={RELAY_LIST}>조건을 바꿀 때마다 목록을 기다려야 했습니다</StackHead>
     <FePhone src={asset1} />
     <FeBlock
       top={268}
       height={312}
       n="1"
       title="조건 변경 시 목록 유지 (TanStack Query)"
-      problem={<>카테고리나 예산을 바꿀 때마다 목록이 비었다가 다시 그려졌고(약 155ms),<br />이미 본 조건으로 돌아가도 같은 요청을 다시 보내고 기다려야 했습니다.</>}
     >
       <FeGain delta={<FeDelta from="156ms" to="0ms" />}>새 목록이 올 때까지 이전 목록을 흐리게 유지 (목록 공백)</FeGain>
       <FeGain delta={<FeDelta from="158ms" to="5ms" />}>조회 결과 캐시 (같은 조건 재방문 대기)</FeGain>
     </FeBlock>
-    <FeBlock top={610} height={312} n="2" title="상품 카드 불필요한 재렌더링 제거" problem="조건을 바꿀 때마다 이미 화면에 있는 카드까지 전부 다시 렌더링되고 있었습니다.">
+    <FeBlock top={610} height={312} n="2" title="상품 카드 불필요한 재렌더링 제거">
       <FeGain delta={<FeDelta from="195회" to="0회" />}>표시 값이 같으면 건너뛰는 memo와 비교 함수 (카드 재렌더링)</FeGain>
       <FeGain delta={<FeDelta from="19.2ms" to="6.6ms" />}>조건 5번 변경 기준 목록 렌더링 합계</FeGain>
     </FeBlock>
@@ -1663,41 +1707,13 @@ const VirtualStat = ({ label, from, to, badge }: { label: string; from: string; 
 
 const FeListVirtual: Page = () => (
   <Slide>
-    <StackHead step="상품 목록" stack="FE" relay={RELAY_LIST}>5,000장이 쌓여도 멈추지 않습니다</StackHead>
+    <StackHead step="상품 목록" stack="FE" relay={RELAY_LIST}>“상품이 많아질수록 스크롤이 끊겨요”</StackHead>
     <FePhone src={asset1} />
     <div
       style={{
         position: 'absolute',
         left: 600,
-        top: 268,
-        width: 1200,
-        height: 168,
-        boxSizing: 'border-box',
-        borderRadius: 28,
-        background: 'var(--osd-text)',
-        color: '#FFFFFF',
-        padding: '0 40px',
-        display: 'flex',
-        alignItems: 'center',
-        fontSize: 24,
-        fontWeight: 500,
-        lineHeight: 1.5,
-      }}
-    >
-      <div style={{ display: 'flex', gap: 14 }}>
-      <ProblemTag dark />
-      <span>
-        추천 상품은 취향 분석을 할 때마다 상한 없이 쌓이는데, 불러온 카드를 모두 DOM에 두는 구조였습니다.
-        <br />
-        목록이 길어지면 스크롤이 끊기고, 상세에서 돌아올 때 화면이 약 5초간 멈췄습니다.
-      </span>
-      </div>
-    </div>
-    <div
-      style={{
-        position: 'absolute',
-        left: 600,
-        top: 456,
+        top: 386,
         width: 1200,
         height: 96,
         ...card,
@@ -1715,13 +1731,13 @@ const FeListVirtual: Page = () => (
       TanStack Virtual로 화면 근처 카드만 DOM에 유지
       <span style={{ fontSize: 22, fontWeight: 500, color: muted }}>첫 화면은 서버 렌더링 유지, 5,000장 기준 측정</span>
     </div>
-    <Box left={600} top={576} width={1200} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+    <Box left={600} top={506} width={1200} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
       <VirtualStat label="DOM 노드" from="50,271" to="643" badge="−98.7%" />
       <VirtualStat label="메모리 (힙)" from="193MB" to="21MB" badge="−89%" />
       <VirtualStat label="스크롤 중 Long Task" from="17건" to="0건" badge="끊김 없음" />
       <VirtualStat label="뒤로 가기 복원" from="5,038ms" to="132ms" badge="38배" />
     </Box>
-    <FeLink fx={0.5} fy={0.8} x2={600} y2={504} />
+    <FeLink fx={0.5} fy={0.8} x2={600} y2={434} />
     <FeHot fx={0.5} fy={0.8} />
     <FlowBar flow="A" current={3} />
   </Slide>
@@ -1785,107 +1801,397 @@ const Plain = ({ children }: { children: ReactNode }) => (
   <span style={{ fontSize: 26, fontWeight: 800, whiteSpace: 'nowrap', fontFamily: 'var(--osd-font-display)' }}>{children}</span>
 );
 
+/* ── 공통: 어두운 원인 띠 ── */
+
+const CauseBand = ({ title, children }: { title: ReactNode; children: ReactNode }) => (
+  <div
+    style={{
+      position: 'absolute',
+      left: 600,
+      top: 268,
+      width: 1200,
+      height: 108,
+      boxSizing: 'border-box',
+      borderRadius: 28,
+      background: 'var(--osd-text)',
+      color: '#FFFFFF',
+      padding: '0 36px',
+      display: 'flex',
+      alignItems: 'center',
+      gap: 22,
+    }}
+  >
+    <span style={{ flex: 'none', padding: '6px 16px', borderRadius: 999, background: 'var(--osd-accent)', color: 'var(--osd-text)', fontSize: 22, fontWeight: 800 }}>문제</span>
+    <div>
+      <div style={{ fontSize: 29, fontWeight: 800 }}>{title}</div>
+      <div style={{ fontSize: 21, fontWeight: 500, color: 'rgba(255,255,255,0.7)', marginTop: 4 }}>{children}</div>
+    </div>
+  </div>
+);
+
+/* ── AI 채팅: 작업 큐 ── */
+
+const DNode = ({ x, y, w, h = 74, hi, ghost, children }: { x: number; y: number; w: number; h?: number; hi?: boolean; ghost?: boolean; children: ReactNode }) => (
+  <div
+    style={{
+      position: 'absolute',
+      left: x,
+      top: y,
+      width: w,
+      height: h,
+      boxSizing: 'border-box',
+      borderRadius: 16,
+      background: hi ? 'var(--osd-accent)' : ghost ? 'rgba(21,21,21,0.03)' : 'rgba(21,21,21,0.06)',
+      border: ghost ? '2.5px dashed #BBBBBB' : '2.5px solid var(--osd-text)',
+      color: ghost ? '#AAAAAA' : 'var(--osd-text)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontSize: 25,
+      fontWeight: 800,
+      whiteSpace: 'nowrap',
+    }}
+  >
+    {children}
+  </div>
+);
+
+const DLabel = ({ x, y, children }: { x: number; y: number; children: ReactNode }) => (
+  <span style={{ position: 'absolute', left: x, top: y, fontSize: 19, fontWeight: 700, color: muted, whiteSpace: 'nowrap' }}>{children}</span>
+);
+
 const BeChat: Page = () => (
   <Slide>
-    <StackHead step="AI 채팅" stack="BE" relay={RELAY_CHAT}>이 답변이 도착하기까지</StackHead>
+    <StackHead step="AI 채팅" stack="BE" relay={RELAY_CHAT}>답변이 존재하지 않는 사용자의 메시지</StackHead>
     <FePhone src={screenChat1} ar={AR_OLD} />
-    <PathStrip>
-      <PathNode>메시지</PathNode>
-      <PathArrow />
-      <PathNode hi>DB 작업 원본</PathNode>
-      <PathArrow />
-      <PathNode hi>Redis Streams</PathNode>
-      <PathArrow />
-      <PathNode hi>워커</PathNode>
-      <PathArrow />
-      <PathNode hi>연결별 큐</PathNode>
-      <PathArrow />
-      <PathNode>SSE 답변</PathNode>
-    </PathStrip>
-    <FeBlock top={368} height={280} n="1" title="Redis Streams 작업 큐 도입" problem="답변 작업이 서버 메모리에만 있어서, 서버 장애가 나면 AI 답변이 그대로 사라졌습니다.">
-      <FeGain delta={<FeDelta from="548건" to="0건" />}>작업 원본은 DB에, 처리는 Redis Streams 워커가 (완전 유실)</FeGain>
-      <FeGain delta={<Plain>중복 0건</Plain>}>하트비트, 펜싱 토큰으로 재처리 권한 관리</FeGain>
-    </FeBlock>
-    <FeBlock top={664} height={280} n="2" title="SSE 답변 순서 보장, 느린 연결 격리" problem="소켓 쓰기가 끝날 때까지 전송이 멈춰서, 느린 연결 하나 때문에 다른 연결까지 기다렸습니다.">
-      <FeGain delta={<Plain>순서 보장</Plain>}>수신과 쓰기를 분리하고, 연결별 큐와 가상 스레드로 순차 전송</FeGain>
-      <FeGain delta={<Plain>연결 간 격리</Plain>}>느린 연결은 그 연결만 늦어짐</FeGain>
-    </FeBlock>
-    <FeLink ar={AR_OLD} fx={0.62} fy={0.29} x2={600} y2={508} />
-    <FeLink ar={AR_OLD} fx={0.62} fy={0.57} x2={600} y2={804} />
-    <FeHot ar={AR_OLD} fx={0.62} fy={0.29} />
-    <FeHot ar={AR_OLD} fx={0.62} fy={0.57} />
+    <div style={{ position: 'absolute', left: 188, top: 535, width: 244, height: 92, background: '#F2F2F2' }} />
+    <div
+      style={{
+        position: 'absolute',
+        left: 222,
+        top: 548,
+        width: 176,
+        height: 66,
+        boxSizing: 'border-box',
+        borderRadius: 14,
+        border: '2.5px dashed #BBBBBB',
+        background: '#E8E8E8',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: 17,
+        fontWeight: 700,
+        color: '#AAAAAA',
+      }}
+    >
+      답변이 오지 않아요
+    </div>
+    <CauseBand title="답변 작업이 서버 메모리에만 존재">서버에 장애가 나면 생성 중이던 AI 답변도 함께 사라졌습니다</CauseBand>
+    <div style={{ position: 'absolute', left: 600, top: 396, width: 1200, height: 398, ...card, border: '2.5px solid var(--osd-text)' }}>
+      <div style={{ position: 'absolute', left: 40, top: 34, display: 'flex', alignItems: 'center', gap: 18 }}>
+        <Num n="1" dark />
+        <span style={{ fontSize: 32, fontWeight: 800 }}>Redis Streams 작업 큐 도입</span>
+      </div>
+      <svg width="1200" height="398" viewBox="0 0 1200 398" style={{ position: 'absolute', left: 0, top: 0 }} aria-hidden="true">
+        <g fill="none" strokeWidth="2.5">
+          <path d="M 186 172 H 251" stroke="#151515" />
+          <path d="M 416 172 H 482" stroke="#151515" />
+          <path d="M 333 209 V 296" stroke="#151515" />
+          <path d="M 462 330 H 900 V 262" stroke="#151515" />
+          <path d="M 706 160 C 740 160, 740 128, 769 128" stroke="#BBBBBB" strokeDasharray="7 6" />
+          <path d="M 706 184 C 740 184, 740 228, 769 228" stroke="#151515" />
+          <path d="M 954 228 C 985 228, 990 172, 1019 172" stroke="#151515" />
+          <path d="M 862 152 V 200" stroke="#151515" strokeDasharray="4 5" />
+        </g>
+      </svg>
+      <DNode x={40} y={135} w={146}>메시지</DNode>
+      <DNode x={251} y={135} w={165}>API 서버</DNode>
+      <DNode hi x={482} y={135} w={224}>Redis Streams</DNode>
+      <DNode ghost x={769} y={100} w={186} h={54}>워커 A</DNode>
+      <span style={{ position: 'absolute', left: 880, top: 84, padding: '3px 12px', borderRadius: 999, background: 'var(--osd-text)', color: '#FFFFFF', fontSize: 17, fontWeight: 800, whiteSpace: 'nowrap' }}>하트비트 끊김</span>
+      <DNode hi x={769} y={200} w={186} h={58}>워커 B</DNode>
+      <DNode x={1019} y={135} w={146}>SSE 답변</DNode>
+      <DNode hi x={166} y={296} w={296} h={70}>DB 작업 원본</DNode>
+      <DLabel x={426} y={104}>② 발행</DLabel>
+      <DLabel x={350} y={240}>① 원본 저장</DLabel>
+      <DLabel x={530} y={298}>③ 원본 조회, 결과 저장</DLabel>
+      <DLabel x={878} y={165}>이어받기</DLabel>
+    </div>
+    <div style={{ position: 'absolute', left: 600, top: 814, width: 1200, height: 140, ...card, padding: '0 40px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 10 }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 30 }}>
+        <span style={{ fontSize: 28, fontWeight: 800 }}>답변 유실</span>
+        <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 18, fontFamily: 'var(--osd-font-display)', letterSpacing: track.display }}>
+          <span style={{ fontSize: 44, fontWeight: 800, color: muted }}>548건</span>
+          <span style={{ fontSize: 40, fontWeight: 800 }}>→</span>
+          <span style={{ fontSize: 64, fontWeight: 800, lineHeight: 1 }}>0건</span>
+        </span>
+      </div>
+      <div style={{ fontSize: 21, fontWeight: 500, color: muted }}>
+        MQ 도입으로 생긴 중복 생성 문제는 <b style={{ color: 'var(--osd-text)' }}>펜싱 토큰 + 하트비트</b>로 처리했습니다.
+      </div>
+    </div>
+    <FeLink ar={AR_OLD} fx={0.85} fy={0.563} x2={600} y2={322} />
+    <FeHot ar={AR_OLD} fx={0.85} fy={0.563} />
     <FlowBar flow="A" current={1} />
   </Slide>
 );
 
+/* ── 메인 페이지 알림 1: 생성 배치 ── */
+
+const Cyl = ({ left, top, width, height, children }: { left: number; top: number; width: number; height: number; children: ReactNode }) => (
+  <div style={{ position: 'absolute', left, top, width, height }}>
+    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} style={{ position: 'absolute', inset: 0 }} aria-hidden="true">
+      <path d={`M 2 14 V ${height - 14} A ${width / 2 - 2} 12 0 0 0 ${width - 2} ${height - 14} V 14`} fill={surface} stroke="#151515" strokeWidth="2.5" />
+      <ellipse cx={width / 2} cy="14" rx={width / 2 - 2} ry="12" fill={surface} stroke="#151515" strokeWidth="2.5" />
+    </svg>
+    <div style={{ position: 'absolute', inset: '20px 0 0', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', fontSize: 23, fontWeight: 800, lineHeight: 1.25 }}>{children}</div>
+  </div>
+);
+
+const StageBox = ({ left, top, width, height, title, pill }: { left: number; top: number; width: number; height: number; title: ReactNode; pill: ReactNode }) => (
+  <div
+    style={{
+      position: 'absolute',
+      left,
+      top,
+      width,
+      height,
+      boxSizing: 'border-box',
+      borderRadius: 22,
+      background: 'var(--osd-text)',
+      color: '#FFFFFF',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 10,
+    }}
+  >
+    <span style={{ fontSize: 25, fontWeight: 800, whiteSpace: 'nowrap' }}>{title}</span>
+    <span style={{ padding: '4px 14px', borderRadius: 999, background: 'var(--osd-accent)', color: 'var(--osd-text)', fontSize: 19, fontWeight: 800, whiteSpace: 'nowrap' }}>{pill}</span>
+  </div>
+);
+
+const SmallArrow = ({ left, top }: { left: number; top: number }) => (
+  <svg width="34" height="22" viewBox="0 0 34 22" style={{ position: 'absolute', left, top }} aria-hidden="true">
+    <path d="M 2 11 H 28 M 20 4 L 28 11 L 20 18" fill="none" stroke="#151515" strokeWidth="3" />
+  </svg>
+);
+
+const CompareBar = ({ label, pct, after, slo }: { label: string; pct: number; after?: boolean; slo?: number }) => (
+  <div style={{ display: 'flex', alignItems: 'center', gap: 20, height: 34 }}>
+    <span style={{ width: 22, fontSize: 21, fontWeight: 800 }}>{label}</span>
+    <span style={{ position: 'relative', flex: 1, height: 30 }}>
+      <span
+        style={{
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          width: `${pct}%`,
+          height: '100%',
+          borderRadius: 6,
+          boxSizing: 'border-box',
+          background: after ? 'var(--osd-accent)' : '#DDD5BD',
+          border: after ? '2px solid var(--osd-text)' : 'none',
+        }}
+      />
+      {slo ? <span style={{ position: 'absolute', left: `${slo}%`, top: -50, height: 110, borderLeft: '2.5px dashed var(--osd-text)' }} /> : null}
+    </span>
+  </div>
+);
+
+const BatchStat = ({ left, label, badge, value, before, children, footer }: { left: number; label: string; badge: string; value: string; before: string; children: ReactNode; footer: string }) => (
+  <div
+    style={{
+      position: 'absolute',
+      left,
+      top: 478,
+      width: 374,
+      height: 420,
+      ...card,
+      border: '2.5px solid var(--osd-text)',
+      boxShadow: '10px 10px 0 var(--osd-accent)',
+      padding: '28px 30px',
+      display: 'flex',
+      flexDirection: 'column',
+    }}
+  >
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <span style={{ fontSize: 24, fontWeight: 700, color: muted }}>{label}</span>
+      <span style={{ padding: '4px 16px', borderRadius: 999, background: 'var(--osd-text)', color: 'var(--osd-accent)', fontSize: 26, fontWeight: 800, fontFamily: 'var(--osd-font-display)' }}>{badge}</span>
+    </div>
+    <span style={{ fontSize: 88, fontWeight: 800, lineHeight: 1, fontFamily: 'var(--osd-font-display)', letterSpacing: track.display, marginTop: 26 }}>{value}</span>
+    <span style={{ fontSize: 21, fontWeight: 600, color: muted, marginTop: 14 }}>
+      개선 전 <b style={{ fontSize: 25, color: '#555555' }}>{before}</b>
+    </span>
+    <div style={{ display: 'grid', gap: 12, marginTop: 'auto' }}>{children}</div>
+    <div style={{ borderTop: `2px solid ${line}`, marginTop: 18, paddingTop: 14, fontSize: 20, fontWeight: 600, color: muted, whiteSpace: 'nowrap' }}>{footer}</div>
+  </div>
+);
+
 const BeBatch: Page = () => (
   <Slide>
-    <StackHead step="메인 페이지 알림" stack="BE">이 알림 한 줄이 만들어지기까지</StackHead>
+    <StackHead step="메인 페이지 알림" stack="BE">대량 알림 생성 배치, 서버 자원 과다사용 &amp; SLO 미달</StackHead>
     <FePhone src={asset4} />
-    <PathStrip>
-      <PathNode>생일 배치 시작</PathNode>
-      <PathArrow />
-      <PathNode hi>Reader 대상 조회</PathNode>
-      <PathArrow />
-      <PathNode hi>친구 관계 조회</PathNode>
-      <PathArrow />
-      <PathNode hi>Writer 알림 저장</PathNode>
-      <PathArrow />
-      <PathNode>알림 목록</PathNode>
-    </PathStrip>
-    <FeBlock
-      top={368}
-      height={410}
-      n="1"
-      title="알림 생성 배치 최적화"
-      problem={<>대상을 한 번에 조회해 메모리가 1980MB까지 오르고 STW가 15.3초 발생했습니다.<br />Full Scan과 Lookup이 반복됐고, 건마다 INSERT해서 생성에만 307초가 걸렸습니다.</>}
-    >
-      <FeGain delta={<FeDelta from="1980MB" to="900MB" />}>Reader를 커서 기반 chunk 조회로 (메모리)</FeGain>
-      <FeGain delta={<FeDelta from="17초" to="6.7초" />}>생일 가상 컬럼 복합 인덱스, 친구 커버링 인덱스 (조회)</FeGain>
-      <FeGain delta={<FeDelta from="307초" to="61초" />}>JdbcTemplate Batch Insert, DB와 네트워크 I/O −93% (알림 생성)</FeGain>
-    </FeBlock>
-    <Box left={600} top={798} width={1200} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
-      <VirtualStat label="STW" from="15.3초" to="5.3초" badge="−65%" />
-      <VirtualStat label="검사 행" from="2,700만" to="603만" badge="−78%" />
-    </Box>
-    <FeLink fx={0.45} fy={0.19} x2={600} y2={573} />
+    <Cyl left={612} top={268} width={108} height={104}>
+      사용자
+      <br />
+      DB
+    </Cyl>
+    <SmallArrow left={734} top={309} />
+    <StageBox left={780} top={268} width={250} height={104} title="① Reader" pill="커서로 chunk 조회" />
+    <SmallArrow left={1044} top={309} />
+    <StageBox left={1090} top={268} width={250} height={104} title="② 친구 관계 조회" pill="인덱스 탐색" />
+    <SmallArrow left={1354} top={309} />
+    <StageBox left={1400} top={268} width={250} height={104} title="③ Writer" pill="Batch Insert" />
+    <SmallArrow left={1664} top={309} />
+    <Cyl left={1706} top={268} width={94} height={104}>
+      알림
+      <br />
+      DB
+    </Cyl>
+    <svg width="760" height="60" viewBox="0 0 760 60" style={{ position: 'absolute', left: 890, top: 378 }} aria-hidden="true">
+      <path d="M 635 2 V 40 H 14 V 8 M 6 16 L 14 6 L 22 16" fill="none" stroke="#151515" strokeWidth="2.5" strokeDasharray="6 6" />
+    </svg>
+    <span style={{ position: 'absolute', left: 1130, top: 402, padding: '0 14px', background: 'var(--osd-bg)', fontSize: 20, fontWeight: 700, color: muted }}>다음 chunk 반복</span>
+    <BatchStat left={600} label="BE 메모리" badge="−32%" value="60%" before="88%" footer="1,805 → 1,228MiB (한도 2GB)">
+      <CompareBar label="전" pct={88} />
+      <CompareBar after label="후" pct={60} />
+    </BatchStat>
+    <BatchStat left={1013} label="BE CPU" badge="−55%p" value="45%" before="100%" footer="최대치, 평균 50% → 32%">
+      <CompareBar label="전" pct={100} />
+      <CompareBar after label="후" pct={45} />
+    </BatchStat>
+    <BatchStat left={1426} label="최종 배치 시간" badge="−73%" value="135초" before="491초" footer="SLO 5분 통과">
+      <CompareBar label="전" pct={100} slo={61} />
+      <CompareBar after label="후" pct={27} />
+    </BatchStat>
+    <span style={{ position: 'absolute', left: 1676, top: 682, fontSize: 18, fontWeight: 800 }}>SLO 5분</span>
+    <Box left={600} top={922} width={1200} style={{ textAlign: 'right', fontSize: 19, fontWeight: 600, color: muted }}>부하 테스트, 알림 약 300만 건, 배치 BE 1 vCPU 2GB</Box>
+    <FeLink fx={0.45} fy={0.19} x2={600} y2={320} />
     <FeHot fx={0.45} fy={0.19} />
-    <FlowBar flow="A" current={6} />
+    <FlowBar flow="A" current={5} />
   </Slide>
+);
+
+/* ── 메인 페이지 알림 2: 발송 ── */
+
+const PushSide = ({ label, from, to }: { label: string; from: string; to: string }) => (
+  <div style={{ borderTop: '2px solid rgba(255,255,255,0.18)', paddingTop: 16 }}>
+    <div style={{ fontSize: 22, fontWeight: 700, color: 'rgba(255,255,255,0.7)' }}>{label}</div>
+    <div style={{ display: 'flex', alignItems: 'baseline', gap: 14, marginTop: 10, fontFamily: 'var(--osd-font-display)', letterSpacing: track.display, whiteSpace: 'nowrap' }}>
+      <span style={{ fontSize: 28, fontWeight: 700, color: 'rgba(255,255,255,0.6)' }}>{from}</span>
+      <span style={{ fontSize: 26, fontWeight: 800 }}>→</span>
+      <span style={{ fontSize: 48, fontWeight: 800, color: 'var(--osd-accent)', lineHeight: 1 }}>{to}</span>
+    </div>
+  </div>
+);
+
+const WorkerPill = ({ top, children }: { top: number; children: ReactNode }) => (
+  <div
+    style={{
+      position: 'absolute',
+      left: 1262,
+      top,
+      width: 226,
+      height: 32,
+      borderRadius: 8,
+      background: 'var(--osd-text)',
+      color: '#FFFFFF',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontSize: 19,
+      fontWeight: 800,
+    }}
+  >
+    {children}
+  </div>
 );
 
 const BePush: Page = () => (
   <Slide>
-    <StackHead step="메인 페이지 알림" stack="BE">이 알림이 빠짐없이 도착하기까지</StackHead>
+    <StackHead step="메인 페이지 알림" stack="BE">알림이 몰리면 스레드풀이 넘쳐 알림이 유실</StackHead>
     <FePhone src={asset4} />
-    <PathStrip>
-      <PathNode>알림 생성</PathNode>
-      <PathArrow />
-      <PathNode hi>DB 태스크큐</PathNode>
-      <PathArrow />
-      <PathNode hi>워커 인스턴스 여러 대</PathNode>
-      <PathArrow />
-      <PathNode hi>Virtual Thread, Semaphore</PathNode>
-      <PathArrow />
-      <PathNode>웹푸시</PathNode>
-    </PathStrip>
-    <FeBlock
-      top={368}
-      height={410}
-      n="2"
-      title="알림 발송 안정화"
-      problem={<>웹푸시 89만 건을 배치 서버의 스레드풀로 처리했는데, 용량을 넘으면서<br />196건이 거부되고 유실됐습니다. 15분 내 발송률은 약 8%에 그쳤습니다.</>}
+    <div
+      style={{
+        position: 'absolute',
+        left: 600,
+        top: 268,
+        width: 1200,
+        height: 330,
+        boxSizing: 'border-box',
+        borderRadius: 32,
+        background: 'var(--osd-text)',
+        color: '#FFFFFF',
+        padding: '34px 48px',
+        display: 'grid',
+        gridTemplateColumns: '1fr 400px',
+        gap: 56,
+      }}
     >
-      <FeGain delta={<FeDelta from="196건" to="0건" />}>DB 태스크큐로 생성과 발행을 한 트랜잭션에 (작업 거부)</FeGain>
-      <FeGain>여러 워커 인스턴스가 큐의 작업을 나눠 처리</FeGain>
-      <FeGain delta={<FeDelta from="37~74건" to="약 600건" />}>워커별 동시 요청 수를 제한한 병렬 처리 (초당 처리량)</FeGain>
-    </FeBlock>
-    <Box left={600} top={798} width={1200}>
-      <VirtualStat label="15분 내 발송률" from="약 8%" to="약 80%" />
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+          <span style={{ fontSize: 25, fontWeight: 700, color: 'rgba(255,255,255,0.7)' }}>15분 내 발송률</span>
+          <span style={{ padding: '4px 16px', borderRadius: 999, background: 'var(--osd-accent)', color: 'var(--osd-text)', fontSize: 24, fontWeight: 800 }}>10배</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 28, marginTop: 'auto', fontFamily: 'var(--osd-font-display)', letterSpacing: track.display }}>
+          <span style={{ fontSize: 60, fontWeight: 700, color: 'rgba(255,255,255,0.55)' }}>8%</span>
+          <span style={{ fontSize: 56, fontWeight: 800 }}>→</span>
+          <span style={{ fontSize: 190, fontWeight: 800, color: 'var(--osd-accent)', lineHeight: 0.9 }}>80%</span>
+        </div>
+      </div>
+      <div style={{ display: 'grid', alignContent: 'center', gap: 26 }}>
+        <PushSide label="작업 유실" from="196건" to="0건" />
+        <PushSide label="초당 처리량" from="37~74건" to="약 600건" />
+      </div>
+    </div>
+    <Box left={600} top={614} width={1200} style={{ textAlign: 'right', fontSize: 19, fontWeight: 600, color: muted }}>
+      부하 테스트 기준, 사용자 300만 명 가정
     </Box>
-    <FeLink fx={0.07} fy={0.026} x2={600} y2={573} />
+    <StageBox left={700} top={690} width={250} height={108} title="알림 생성" pill="+ 태스크 한 트랜잭션" />
+    <SmallArrow left={956} top={733} />
+    <Cyl left={996} top={690} width={212} height={108}>DB 태스크큐</Cyl>
+    <svg width="54" height="108" viewBox="0 0 54 108" style={{ position: 'absolute', left: 1208, top: 690 }} aria-hidden="true">
+      <g fill="none" stroke="#151515" strokeWidth="2.5">
+        <path d="M 2 54 L 50 16 M 2 54 H 50 M 2 54 L 50 92" />
+        <path d="M 40 14 L 50 16 L 46 26 M 42 46 L 50 54 L 42 62 M 46 82 L 50 92 L 40 94" />
+      </g>
+    </svg>
+    <WorkerPill top={690}>워커 1</WorkerPill>
+    <WorkerPill top={728}>워커 2</WorkerPill>
+    <WorkerPill top={766}>워커 3</WorkerPill>
+    <svg width="54" height="108" viewBox="0 0 54 108" style={{ position: 'absolute', left: 1488, top: 690 }} aria-hidden="true">
+      <g fill="none" stroke="#151515" strokeWidth="2.5">
+        <path d="M 4 16 L 50 54 M 4 54 H 50 M 4 92 L 50 54" />
+        <path d="M 42 46 L 50 54 L 42 62" />
+      </g>
+    </svg>
+    <div
+      style={{
+        position: 'absolute',
+        left: 1546,
+        top: 690,
+        width: 160,
+        height: 108,
+        borderRadius: 22,
+        background: 'var(--osd-text)',
+        color: '#FFFFFF',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: 26,
+        fontWeight: 800,
+      }}
+    >
+      알림
+    </div>
+    <Box left={600} top={830} width={1200} style={{ textAlign: 'center', fontSize: 23, fontWeight: 600, color: muted }}>
+      생성과 발행을 한 트랜잭션으로 묶고, 워커마다 동시 요청 수를 제한해 병렬 발송
+    </Box>
+    <FeLink fx={0.07} fy={0.026} x2={600} y2={432} />
     <FeHot fx={0.07} fy={0.026} />
-    <FlowBar flow="A" current={6} />
+    <FlowBar flow="A" current={5} />
   </Slide>
 );
 
@@ -1925,19 +2231,7 @@ const ProblemBand = ({ top, height, children }: { top: number; height: number; c
 /** 검은 테두리와 노란 그림자 카드 (FeBlock과 같은 모양, 내용은 자유) */
 const HotCard = ({ top, height, children }: { top: number; height: number; children: ReactNode }) => (
   <div
-    style={{
-      position: 'absolute',
-      left: 600,
-      top,
-      width: 1200,
-      height,
-      ...card,
-      border: '2.5px solid var(--osd-text)',
-      boxShadow: '10px 10px 0 var(--osd-accent)',
-      padding: '28px 36px',
-      display: 'flex',
-      flexDirection: 'column',
-    }}
+    style={{ position: 'absolute', left: 600, top: top, width: '1200px', height: '277.72px', ...card, border: '2.5px solid var(--osd-text)', boxShadow: '10px 10px 0 var(--osd-accent)', padding: '28px 36px', display: 'flex', flexDirection: 'column', minWidth: '0px', minHeight: '0px', maxWidth: 'none', maxHeight: 'none', flexShrink: '0', flexGrow: '0', flexBasis: 'auto', translate: '0px -6.96px' }}
   >
     {children}
   </div>
@@ -1945,7 +2239,7 @@ const HotCard = ({ top, height, children }: { top: number; height: number; child
 
 const CardTitle = ({ n, children, note }: { n: string; children: ReactNode; note?: ReactNode }) => (
   <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
-    <Num n={n} dark />
+    {n ? <Num n={n} dark /> : null}
     <span style={{ fontSize: 32, fontWeight: 800 }}>{children}</span>
     {note ? <span style={{ marginLeft: 'auto', fontSize: 21, fontWeight: 600, color: muted }}>{note}</span> : null}
   </div>
@@ -1990,34 +2284,27 @@ const ReactRule = ({ when, then }: { when: ReactNode; then: ReactNode }) => (
 
 const AiChatFlow: Page = () => (
   <Slide>
-    <StackHead step="AI 채팅" stack="AI" relay={RELAY_CHAT}>이 질문이 나오기까지</StackHead>
+    <StackHead step="AI 채팅" stack="AI" relay={RELAY_CHAT}>유저가 짧게 답하면 알아낼때까지 질문하는 문제</StackHead>
     <FePhone src={screenChat2} ar={AR_OLD} />
-    <PathStrip>
-      <PathNode>사용자 답변</PathNode>
-      <PathArrow />
-      <PathNode hi>참여도 계산</PathNode>
-      <PathArrow />
-      <PathNode hi>반응 결정 (코드)</PathNode>
-      <PathArrow />
-      <PathNode>문장 생성 (모델)</PathNode>
-    </PathStrip>
-    <FeBlock
-      top={368}
-      height={300}
-      n="1"
-      title="대화 흐름 제어를 코드와 프롬프트로 나눔"
-      problem={<>대화 방향까지 프롬프트에 맡기니 모델이 프로필의 빈 항목을 채우려고 설문처럼 질문했고,<br />사용자가 지쳐서 짧게 답해도 같은 화제를 계속 물었습니다.</>}
-    >
-      <FeGain>그 사람 평균 대비 답 길이, 웃음과 감탄, 되묻기, 회피 표현으로 매 턴 참여도 계산</FeGain>
-      <FeGain>추천에 필요한 취향 수는 종료 시점과 진행률에만 쓰고, 다음 질문을 고르는 데는 쓰지 않음</FeGain>
-    </FeBlock>
+    <ProblemBand top={268} height={150}>
+      대화 방향까지 프롬프트에 맡기니 빈 프로필 항목을 채우려 설문처럼 질문했고,
+      <br />
+      사용자가 지쳐 짧게 답해도 같은 화제를 계속 물었습니다.
+    </ProblemBand>
+    <HotCard top={444} height={224}>
+      <CardTitle n="1">대화 흐름은 코드가, 문장 생성은 모델이 담당</CardTitle>
+      <div style={{ display: 'grid', gap: 12, marginTop: 'auto' }}>
+        <FeGain>평균 대비 답 길이, 웃음·감탄, 되묻기, 회피 표현으로 매 턴 참여도를 계산</FeGain>
+        <FeGain>취향 수는 종료 시점과 진행률에만 사용하고, 다음 질문은 참여도에 따라 결정</FeGain>
+      </div>
+    </HotCard>
     <Box left={600} top={690} width={1200}>
       <div style={{ fontSize: 26, fontWeight: 800 }}>반응 방식은 코드가 정합니다</div>
     </Box>
     <Box left={600} top={736} width={1200} style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 20 }}>
       <ReactRule when="“모르겠어요”" then="선택지를 줌" />
       <ReactRule when="거절" then="화제를 바꿈" />
-      <ReactRule when="에너지가 계속 낮음" then="가볍게 전환, 마무리" />
+      <ReactRule when="유저 반응이 좋지 않음" then="가볍게 전환, 마무리" />
     </Box>
     <FeLink ar={AR_OLD} fx={0.45} fy={0.115} x2={600} y2={518} />
     <FeLink ar={AR_OLD} fx={0.8} fy={0.71} x2={600} y2={840} />
@@ -2041,7 +2328,7 @@ const PlusSign = () => <span style={{ flex: 'none', fontSize: 34, fontWeight: 80
 
 const AiChatPrompt: Page = () => (
   <Slide>
-    <StackHead step="AI 채팅" stack="AI" relay={RELAY_CHAT}>이 말투가 만들어지기까지</StackHead>
+    <StackHead step="AI 채팅" stack="AI" relay={RELAY_CHAT}>지시문과 예시가 유출되며 대화 패턴이 고정적이고 지루하다!</StackHead>
     <FePhone src={screenChat1} ar={AR_OLD} />
     <ProblemBand top={268} height={150}>
       턴마다 붙인 지시 메모를 모델이 대사처럼 따라 해 “~군요. ~해요?” 패턴으로 굳었고,
@@ -2111,7 +2398,7 @@ const PipeCard = ({ role, title, sub, hi }: { role: string; title: ReactNode; su
 
 const AiTasteExtract: Page = () => (
   <Slide>
-    <StackHead step="취향 분석" stack="AI">이 취향 한 줄이 저장되기까지</StackHead>
+    <StackHead step="취향 분석" stack="AI">유저의 취향 프로필이 만들어지는 과정</StackHead>
     <FePhone src={asset20261112212908} ar={AR_TASTE} />
     <ProblemBand top={268} height={130}>
       추출 모델이 프로필 항목까지 고르면,
@@ -2171,7 +2458,7 @@ const GuardRow = ({ top, n, title, children }: { top: number; n: string; title: 
       padding: '0 36px 0 30px',
     }}
   >
-    <Num n={n} dark />
+    {n ? <Num n={n} dark /> : null}
     <div>
       <div style={{ fontSize: 30, fontWeight: 800 }}>{title}</div>
       <div style={{ fontSize: 22, fontWeight: 500, color: muted, marginTop: 6, lineHeight: 1.45 }}>{children}</div>
@@ -2181,7 +2468,7 @@ const GuardRow = ({ top, n, title, children }: { top: number; n: string; title: 
 
 const AiTasteFix: Page = () => (
   <Slide>
-    <StackHead step="취향 분석" stack="AI">고친 말은 고친 대로 남습니다</StackHead>
+    <StackHead step="취향 분석" stack="AI">유저가 수정한 내용을 반영하여 추천하기</StackHead>
     <FePhone src={asset20261112212908} ar={AR_TASTE} />
     <ProblemBand top={268} height={150}>
       사용자가 “그거 아니에요”라고 고쳐도 기존 값이 남았고,
@@ -2243,19 +2530,21 @@ const QueryPanel = ({ label, hi, result, strike, children }: { label: string; hi
 
 const AiListIntent: Page = () => (
   <Slide>
-    <StackHead step="상품 목록" stack="AI" relay={RELAY_LIST}>이 상품이 검색되기까지</StackHead>
+    <StackHead step="상품 목록" stack="AI" relay={RELAY_LIST}>취향으로 상품을 어떻게 만들지?</StackHead>
     <FePhone src={asset1} />
-    <FeBlock
-      top={268}
-      height={410}
-      n="1"
-      title="관심사별 검색 의도 생성"
-      problem={<>“{'{관심사}'} 관련 제품” 같은 템플릿 쿼리는 상품 문서와 문장 모양이 달라<br />엉뚱한 상품이 검색됐습니다.</>}
-    >
+    <ProblemBand top={268} height={130}>
+      “{'{관심사}'} 관련 제품” 같은 템플릿 쿼리는 상품 문서와 문장 모양이 달라
+      <br />
+      엉뚱한 상품이 검색됐습니다.
+    </ProblemBand>
+    <HotCard top={422} height={256}>
+      <CardTitle n="1">관심사별 검색 의도 생성</CardTitle>
+      <div style={{ display: 'grid', gap: 12, marginTop: 'auto' }}>
       <FeGain>관심사마다 상품 종류, 진열 카테고리, 검색 문장을 LLM이 미리 생성 (카테고리는 목록에서 선택)</FeGain>
       <FeGain delta={<Plain>LLM 대기 없음</Plain>}>대화 중 백그라운드로 생성해 캐시, 추천 요청 때는 캐시만 읽음</FeGain>
       <FeGain>상품 문서를 상품 설명, 사용 상황, 선물 관점으로 나눠 임베딩하고 관점별로 검색</FeGain>
-    </FeBlock>
+      </div>
+    </HotCard>
     <Box left={600} top={704} width={1200} style={{ height: 240, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
       <QueryPanel label="이전 템플릿 쿼리" result="허브티" strike>
         <span style={{ fontSize: 30, fontWeight: 800 }}>“와인 관련 제품”</span>
@@ -2266,7 +2555,7 @@ const AiListIntent: Page = () => (
         <AiChip>검색 문장</AiChip>
       </QueryPanel>
     </Box>
-    <FeLink fx={0.42} fy={0.3} x2={600} y2={473} />
+    <FeLink fx={0.42} fy={0.3} x2={600} y2={333} />
     <FeLink fx={0.5} fy={0.42} x2={600} y2={824} />
     <FeHot fx={0.42} fy={0.3} />
     <FeHot fx={0.5} fy={0.42} />
@@ -2309,7 +2598,7 @@ const SimRange = ({ top, from, to, label, hi }: { top: number; from: number; to:
 
 const AiListFallback: Page = () => (
   <Slide>
-    <StackHead step="상품 목록" stack="AI" relay={RELAY_LIST}>카탈로그에 없는 관심사라면</StackHead>
+    <StackHead step="상품 목록" stack="AI" relay={RELAY_LIST}>취향에 맞는 상품이 없을땐 탐색(exploration)추천으로 전환하기</StackHead>
     <FePhone src={asset1} />
     <ProblemBand top={268} height={130}>
       볼링, 스키, 뜨개질처럼 카탈로그에 상품이 없는 관심사는
@@ -2329,7 +2618,7 @@ const AiListFallback: Page = () => (
     </HotCard>
     <Box left={600} top={770} width={1200} style={{ height: 174, ...card, borderRadius: 28, padding: '24px 36px', display: 'grid', gap: 12, alignContent: 'center' }}>
       <FeGain delta={<FeDelta from="볼링" to="보드게임, 실내 놀이" />}>판정된 관심사는 결과를 버리고, 같은 즐거움으로 넓힌 쿼리로 대체</FeGain>
-      <FeGain>탐색 상품은 관심사당 2개, 목록당 4개까지만 넣어 원래 추천을 덮지 않게 함</FeGain>
+      <FeGain>탐색 상품은 관심사당 2개, 목록당 4개까지만 넣어 원래 추천로직을 유지</FeGain>
     </Box>
     <FeLink fx={0.5} fy={0.62} x2={600} y2={857} />
     <FeLink fx={0.83} fy={0.42} x2={600} y2={585} />
@@ -2339,13 +2628,89 @@ const AiListFallback: Page = () => (
   </Slide>
 );
 
+/* ── 흐름 B 슬쩍 물어보기 ── */
+
+const ASK_AR = 1734 / 686;
+const GIFT_AR = 1708 / 692;
+
+const AskStep = ({ top, n, hi, title, children }: { top: number; n: string; hi?: boolean; title: string; children: ReactNode }) => (
+  <div
+    style={{
+      position: 'absolute',
+      left: 880,
+      top,
+      width: 920,
+      height: 150,
+      ...card,
+      border: hi ? '2.5px solid var(--osd-text)' : card.border,
+      boxShadow: hi ? '10px 10px 0 var(--osd-accent)' : 'none',
+      padding: '0 36px 0 30px',
+      display: 'flex',
+      alignItems: 'center',
+      gap: 26,
+    }}
+  >
+    <Num n={n} dark={hi} />
+    <div>
+      <div style={{ fontSize: 31, fontWeight: 800 }}>{title}</div>
+      <div style={{ fontSize: 23, fontWeight: 500, color: muted, marginTop: 8, lineHeight: 1.45 }}>{children}</div>
+    </div>
+  </div>
+);
+
+const AskFeature: Page = () => (
+  <Slide>
+    <StackHead step="슬쩍 물어보기" stack="FE">망설여지는 선물은 친구에게 슬쩍 물어봅니다</StackHead>
+    <Phone width={290} left={120} top={270}>
+      <img src={screenGiftDetail} alt="상품 상세 화면" style={{ display: 'block', width: '100%', aspectRatio: '692 / 1708', borderRadius: 30 }} />
+    </Phone>
+    <svg width="44" height="24" viewBox="0 0 44 24" style={{ position: 'absolute', left: 422, top: 600 }} aria-hidden="true">
+      <path d="M 2 12 H 38 M 28 3 L 38 12 L 28 21" fill="none" stroke="#151515" strokeWidth="3" />
+    </svg>
+    <Phone width={290} left={478} top={270}>
+      <img src={screenAsk} alt="슬쩍 물어보기 채팅 화면" style={{ display: 'block', width: '100%', aspectRatio: '686 / 1734', borderRadius: 30 }} />
+    </Phone>
+    <div style={{ position: 'absolute', left: 130 + 270 * 0.88 - 22, top: 280 + 270 * GIFT_AR * 0.632 - 22, width: 44, height: 44, borderRadius: '50%', border: '5px solid var(--osd-accent)', boxSizing: 'border-box', boxShadow: '0 0 0 6px rgba(255,230,0,0.3)' }} />
+    <div style={{ position: 'absolute', left: 488 + 270 * 0.9 - 22, top: 280 + 270 * ASK_AR * 0.1 - 22, width: 44, height: 44, borderRadius: '50%', border: '5px solid var(--osd-accent)', boxSizing: 'border-box', boxShadow: '0 0 0 6px rgba(255,230,0,0.3)' }} />
+    <AskStep top={280} n="1" title="상품을 고르고 슬쩍 물어보기">
+      상품 목록에서 고른 선물이 망설여지면, 상세에서 슬쩍 물어보기를 누릅니다
+    </AskStep>
+    <AskStep hi top={450} n="2" title="익명 채팅으로 질문">
+      내 이름과 프로필은 보이지 않고, 상품 카드와 대화만 친구에게 전달됩니다
+    </AskStep>
+    <AskStep top={620} n="3" title="선물 받을지 확인">
+      친구의 대답을 보고 이 상품을 선물할지 정합니다
+    </AskStep>
+    <div
+      style={{
+        position: 'absolute',
+        left: 880,
+        top: 802,
+        width: 920,
+        height: 130,
+        boxSizing: 'border-box',
+        borderRadius: 28,
+        background: 'var(--osd-accent)',
+        padding: '0 36px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 22,
+      }}
+    >
+      <img src={mascot} alt="" style={{ width: 96, flex: 'none', rotate: '-6deg' }} />
+      <span style={{ fontSize: 29, fontWeight: 800, lineHeight: 1.4 }}>
+        선물인 걸 들키지 않고,
+        <br />
+        받을 사람의 마음을 미리 확인
+      </span>
+    </div>
+    <FlowBar flow="B" current={3} />
+  </Slide>
+);
+
 /* ───────────────────────── 03 CL 트래픽을 버티는 방법 ─────────────────────────
  * 흐름 A, B가 끝난 뒤 클라우드 고도화를 보여 줍니다. 화면 대신 구조와 수치로 보여 주고,
- * 아래 막대(InfraBar)는 흐름 막대와 같은 모양으로 지금 주제를 표시합니다.
- * 발표 시 상태(설계, 일부 구성 확인, 예정)와 한계는 문서 그대로 함께 적습니다.
  */
-
-const INFRA_PARTS = ['AI 대화', '데이터 이전 V1 → V2'];
 
 const InfraHead = ({ part, children }: { part: string; children: ReactNode }) => (
   <StackHead step="" stack="CL" eyebrow={<>트래픽을 버티는 방법 {part}</>}>
@@ -2353,83 +2718,6 @@ const InfraHead = ({ part, children }: { part: string; children: ReactNode }) =>
   </StackHead>
 );
 
-/** 화면 아래 주제 막대 + (있으면) 오른쪽 상태 표시 */
-const InfraBar = ({ current, children }: { current: number; children?: ReactNode }) => (
-  <div style={{ position: 'absolute', left: 120, top: 966, width: 1680, display: 'flex', alignItems: 'center', gap: 10 }}>
-    <span
-      style={{
-        width: 46,
-        height: 46,
-        borderRadius: '50%',
-        background: 'var(--osd-text)',
-        color: '#FFFFFF',
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: 19,
-        fontWeight: 800,
-        fontFamily: 'var(--osd-font-display)',
-        marginRight: 8,
-      }}
-    >
-      CL
-    </span>
-    {INFRA_PARTS.map((s, i) => (
-      <span key={s} style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}>
-        {i > 0 ? (
-          <svg width="22" height="16" viewBox="0 0 22 16" aria-hidden="true">
-            <path d="M 0 8 H 18 M 12 2 L 18 8 L 12 14" fill="none" stroke={i <= current ? '#151515' : '#BBBBBB'} strokeWidth="2.5" />
-          </svg>
-        ) : null}
-        <span
-          style={{
-            height: 46,
-            boxSizing: 'border-box',
-            padding: '0 18px',
-            borderRadius: 999,
-            display: 'inline-flex',
-            alignItems: 'center',
-            fontSize: 22,
-            fontWeight: i === current ? 800 : 700,
-            whiteSpace: 'nowrap',
-            background: i === current ? 'var(--osd-accent)' : 'transparent',
-            border: i === current ? '2px solid var(--osd-text)' : `2px solid ${i < current ? '#151515' : line}`,
-            color: i <= current ? 'var(--osd-text)' : muted,
-          }}
-        >
-          {s}
-        </span>
-      </span>
-    ))}
-    {children ? <span style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 22 }}>{children}</span> : null}
-  </div>
-);
-
-/** 발표 시 상태 */
-const Status = ({ level, children }: { level: '설계' | '일부 구성 확인' | '예정' | '한계'; children: ReactNode }) => (
-  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10, fontSize: 20, fontWeight: 600, whiteSpace: 'nowrap' }}>
-    <span
-      style={{
-        height: 34,
-        boxSizing: 'border-box',
-        padding: '0 12px',
-        borderRadius: 10,
-        display: 'inline-flex',
-        alignItems: 'center',
-        fontSize: 18,
-        fontWeight: 800,
-        background: level === '일부 구성 확인' ? 'var(--osd-accent)' : level === '한계' ? 'var(--osd-text)' : surface,
-        color: level === '한계' ? '#FFFFFF' : 'var(--osd-text)',
-        border: level === '예정' ? '2px dashed #BBBBBB' : '2px solid var(--osd-text)',
-      }}
-    >
-      {level}
-    </span>
-    {children}
-  </span>
-);
-
-/** 전체 너비 문제 띠 */
 const WideProblem = ({ top, height, children }: { top: number; height: number; children: ReactNode }) => (
   <div
     style={{
@@ -2499,7 +2787,7 @@ const TrafficCard = ({ left, n, part, title, children, tags }: { left: number; n
     }}
   >
     <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
-      <Num n={n} dark />
+      {n ? <Num n={n} dark /> : null}
       <span style={{ fontSize: 26, fontWeight: 700, color: muted }}>{part}</span>
     </div>
     <div style={{ fontSize: 50, fontWeight: 800, letterSpacing: track.display, fontFamily: 'var(--osd-font-display)', marginTop: 28 }}>{title}</div>
@@ -2519,7 +2807,7 @@ const TrafficIntro: Page = () => (
       left={120}
       n="1"
       part="AI 대화"
-      title="몰려도 번지지 않게"
+      title="트래픽이 몰려도 영향이 가지 않게"
       tags={
         <>
           <AiChip hi>실행 Pool 분리</AiChip>
@@ -2550,167 +2838,171 @@ const TrafficIntro: Page = () => (
   </Slide>
 );
 
-/* ── ① AI 대화 1: 실행 Pool 분리 ── */
+/* ── ① AI 대화 1: Worker 확장 ── */
 
-const PoolRule = ({ label, children }: { label: string; children: ReactNode }) => (
-  <div style={{ borderTop: `2px solid ${line}`, paddingTop: 12 }}>
-    <div style={{ fontSize: 19, fontWeight: 700, color: muted }}>{label}</div>
-    <div style={{ fontSize: 26, fontWeight: 800, marginTop: 4, whiteSpace: 'nowrap' }}>{children}</div>
-  </div>
-);
-
-const PoolCard = ({ left, name, role, children }: { left: number; name: string; role: string; children: ReactNode }) => (
+const FlowCard = ({ left, name, role, hi, children }: { left: number; name: string; role: string; hi?: boolean; children: ReactNode }) => (
   <div
     style={{
       position: 'absolute',
       left,
-      top: 410,
-      width: 480,
-      height: 380,
+      top: 360,
+      width: 330,
+      height: 290,
       ...card,
+      background: hi ? softYellow : card.background,
       border: '2.5px solid var(--osd-text)',
-      boxShadow: '10px 10px 0 var(--osd-accent)',
-      padding: '30px 34px',
+      padding: '32px 30px',
       display: 'flex',
       flexDirection: 'column',
     }}
   >
-    <span style={{ fontSize: 38, fontWeight: 800, fontFamily: 'var(--osd-font-display)', letterSpacing: track.display }}>{name}</span>
-    <span style={{ fontSize: 22, fontWeight: 600, color: muted, marginTop: 6 }}>{role}</span>
-    <div style={{ display: 'grid', gap: 14, marginTop: 'auto' }}>{children}</div>
+    <span style={{ fontSize: 40, fontWeight: 800, fontFamily: 'var(--osd-font-display)', letterSpacing: track.display, whiteSpace: 'nowrap' }}>{name}</span>
+    <span style={{ fontSize: 22, fontWeight: 600, color: hi ? 'var(--osd-text)' : muted, marginTop: 10 }}>{role}</span>
+    <div style={{ fontSize: 27, fontWeight: 800, lineHeight: 1.45, marginTop: 'auto' }}>{children}</div>
   </div>
 );
 
-const PoolArrow = ({ left, label }: { left: number; label: string }) => (
-  <div style={{ position: 'absolute', left, top: 560, width: 120, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-    <span style={{ fontSize: 18, fontWeight: 800, color: muted, whiteSpace: 'nowrap' }}>{label}</span>
-    <svg width="80" height="22" viewBox="0 0 80 22" aria-hidden="true">
-      <path d="M 2 11 H 74 M 64 3 L 74 11 L 64 19" fill="none" stroke="#151515" strokeWidth="3" />
+const StepArrow = ({ left, label }: { left: number; label: string }) => (
+  <div style={{ position: 'absolute', left, top: 450, width: 120, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14 }}>
+    <span style={{ padding: '4px 12px', borderRadius: 10, background: 'var(--osd-text)', color: '#FFFFFF', fontSize: 18, fontWeight: 800, whiteSpace: 'nowrap' }}>{label}</span>
+    <svg width="76" height="22" viewBox="0 0 76 22" aria-hidden="true">
+      <path d="M 2 11 H 70 M 60 3 L 70 11 L 60 19" fill="none" stroke="#151515" strokeWidth="3" />
     </svg>
   </div>
 );
 
+const ScaleStep = ({ label, children }: { label: string; children: ReactNode }) => (
+  <div style={{ flex: 1, textAlign: 'center' }}>
+    <div style={{ fontSize: 22, fontWeight: 700 }}>{label}</div>
+    <div style={{ fontSize: 34, fontWeight: 800, fontFamily: 'var(--osd-font-display)', letterSpacing: track.display, marginTop: 8 }}>{children}</div>
+  </div>
+);
+
+const ScaleArrow = () => (
+  <svg width="34" height="26" viewBox="0 0 34 26" aria-hidden="true" style={{ flex: 'none' }}>
+    <path d="M 2 13 H 28 M 18 4 L 28 13 L 18 22" fill="none" stroke="#151515" strokeWidth="3.5" />
+  </svg>
+);
+
 const ClPools: Page = () => (
   <Slide>
-    <InfraHead part="① AI 대화">같은 이미지, 다른 실행 Pool</InfraHead>
-    <WideProblem top={268} height={110}>
-      SSE 연결, AI 작업 소비, 모델 호출을 같은 Backend Pool에서 처리하면 장애와 적체, 확장 범위가 함께 묶입니다.
-    </WideProblem>
-    <PoolCard left={120} name="ai-api" role="AI 요청과 SSE 연결">
-      <PoolRule label="확장 기준">CPU HPA</PoolRule>
-      <PoolRule label="초기 Replica">3~6</PoolRule>
-    </PoolCard>
-    <PoolArrow left={600} label="Stream" />
-    <PoolCard left={720} name="ai-worker" role="AI 작업 소비">
-      <PoolRule label="확장 기준">KEDA Stream Lag (CPU 아님)</PoolRule>
-      <PoolRule label="초기 Replica">2~4</PoolRule>
-    </PoolCard>
-    <PoolArrow left={1200} label="내부 호출" />
-    <PoolCard left={1320} name="ai-fastapi" role="모델 호출">
-      <PoolRule label="확장 기준">호출량, 응답시간</PoolRule>
-      <PoolRule label="노출">내부 ClusterIP만</PoolRule>
-    </PoolCard>
-    <Box left={120} top={822} width={700} style={{ height: 110, display: 'flex', alignItems: 'center', fontSize: 23, fontWeight: 500, color: muted, lineHeight: 1.5 }}>
-      Backend는 같은 Spring Image를 씁니다.
-      <br />
-      MSA 전환이 아니라 실행 Pool 분리입니다.
+    <InfraHead part="① AI 대화">AI 작업량에 따른 Worker 확장</InfraHead>
+    <Box left={120} top={278} width={1680}>
+      <span style={{ fontSize: 30, fontWeight: 800 }}>요청 처리와 AI 작업 소비 분리</span>
     </Box>
-    <ResultBand left={840} top={822} width={960} height={110}>
-      <PathArrow />
-      AI 요청, 작업 소비, 모델 호출의 장애와 확장 범위 분리
-    </ResultBand>
-    <InfraBar current={0}>
-      <Status level="설계">Deployment 분리, KEDA 2~4</Status>
-      <Status level="예정">부하, 장애 테스트</Status>
-    </InfraBar>
+    <FlowCard left={120} name="ai-api" role="요청 처리">
+      메시지 접수
+      <br />
+      SSE 연결 유지
+    </FlowCard>
+    <StepArrow left={450} label="작업 등록" />
+    <FlowCard hi left={570} name="Valkey Stream" role="작업 대기열">
+      AI 작업 저장
+    </FlowCard>
+    <StepArrow left={900} label="작업 소비" />
+    <FlowCard left={1020} name="ai-worker" role="작업 처리">
+      모델 호출
+      <br />
+      결과 저장
+    </FlowCard>
+    <StepArrow left={1350} label="모델 요청" />
+    <FlowCard left={1470} name="ai-fastapi" role="모델 실행">
+      답변 생성
+      <br />
+      Worker에 반환
+    </FlowCard>
+    <div
+      style={{
+        position: 'absolute',
+        left: 120,
+        top: 700,
+        width: 1680,
+        height: 180,
+        boxSizing: 'border-box',
+        borderRadius: 28,
+        background: softYellow,
+        border: '2.5px solid var(--osd-text)',
+        padding: '0 60px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 24,
+      }}
+    >
+      <ScaleStep label="감지">Stream Lag 증가</ScaleStep>
+      <ScaleArrow />
+      <ScaleStep label="확장">ai-worker Pod</ScaleStep>
+      <ScaleArrow />
+      <ScaleStep label="응답 전달">ai-api SSE</ScaleStep>
+    </div>
   </Slide>
 );
 
 /* ── ① AI 대화 2: Valkey A/B ── */
 
-const ValkeyCard = ({ left, name, lane, hi, children }: { left: number; name: string; lane: string; hi?: boolean; children: ReactNode }) => (
+const ValkeyTile = ({ hi, children }: { hi?: boolean; children: ReactNode }) => (
   <div
     style={{
-      position: 'absolute',
-      left,
-      top: 410,
-      width: 800,
-      height: 330,
-      ...card,
-      border: '2.5px solid var(--osd-text)',
-      boxShadow: hi ? '10px 10px 0 var(--osd-accent)' : 'none',
-      padding: '30px 36px',
+      height: 110,
+      borderRadius: 20,
+      background: hi ? softYellow : 'rgba(21,21,21,0.05)',
+      padding: '0 30px',
       display: 'flex',
-      flexDirection: 'column',
+      alignItems: 'center',
+      gap: 16,
+      fontSize: 28,
+      fontWeight: 800,
+      lineHeight: 1.3,
     }}
   >
-    <span style={{ fontSize: 22, fontWeight: 700, color: muted }}>{lane}</span>
-    <span style={{ fontSize: 46, fontWeight: 800, fontFamily: 'var(--osd-font-display)', letterSpacing: track.display, marginTop: 6 }}>{name}</span>
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginTop: 'auto' }}>{children}</div>
-    <div style={{ fontSize: 20, fontWeight: 600, color: muted, marginTop: 18 }}>Multi-AZ, Automatic Failover</div>
+    <span style={{ flex: 'none', width: 12, height: 12, borderRadius: '50%', background: hi ? '#D9A800' : 'var(--osd-text)' }} />
+    {children}
   </div>
 );
 
-const SmallNote = ({ left, width, title, children }: { left: number; width: number; title: string; children: ReactNode }) => (
+const ValkeyRow = ({ top, name, lane, children }: { top: number; name: string; lane: string; children: ReactNode }) => (
   <div
     style={{
       position: 'absolute',
-      left,
-      top: 772,
-      width,
-      height: 160,
+      left: 120,
+      top,
+      width: 1680,
+      height: 180,
       ...card,
-      borderRadius: 28,
-      padding: '24px 32px',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: 8,
+      border: '2.5px solid var(--osd-text)',
+      padding: '0 34px 0 40px',
+      display: 'grid',
+      gridTemplateColumns: '400px 1fr',
+      alignItems: 'center',
     }}
   >
-    <span style={{ fontSize: 21, fontWeight: 700, color: muted }}>{title}</span>
-    <span style={{ fontSize: 25, fontWeight: 700, lineHeight: 1.45 }}>{children}</span>
+    <div style={{ borderRight: `2px solid ${line}`, height: 120, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+      <span style={{ fontSize: 24, fontWeight: 700, color: muted }}>{lane}</span>
+      <span style={{ fontSize: 52, fontWeight: 800, fontFamily: 'var(--osd-font-display)', letterSpacing: track.display, marginTop: 6 }}>{name}</span>
+    </div>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20, paddingLeft: 40 }}>{children}</div>
   </div>
 );
 
 const ClValkey: Page = () => (
   <Slide>
-    <InfraHead part="① AI 대화">큐가 밀려도 로그인은 밀리지 않게</InfraHead>
-    <WideProblem top={268} height={110}>
-      AI Stream 적체가 OAuth, Rate Limit, 일반 사용자 요청용 Redis까지 영향을 줄 수 있었습니다.
+    <InfraHead part="① AI 대화">로그인과 AI 작업을 분리한 Valkey 구성</InfraHead>
+    <WideProblem top={268} height={96}>
+      한 Valkey에 부하가 몰리면 AI 작업 적체가 로그인과 요청 제어까지 지연
     </WideProblem>
-    <ValkeyCard left={120} name="Valkey A" lane="사용자 요청 경로">
-      <AiChip>OAuth</AiChip>
-      <AiChip>Rate Limit</AiChip>
-      <AiChip>Cooldown</AiChip>
-      <AiChip>일반 Lock</AiChip>
-    </ValkeyCard>
-    <div style={{ position: 'absolute', left: 940, top: 430, width: 40, height: 290, display: 'flex', justifyContent: 'center' }}>
-      <span style={{ width: 0, height: '100%', borderLeft: '4px dashed var(--osd-text)' }} />
-    </div>
-    <ValkeyCard hi left={1000} name="Valkey B" lane="비동기 작업 경로">
-      <AiChip hi>AI Stream</AiChip>
-      <AiChip hi>대량 알림 Stream</AiChip>
-      <AiChip hi>Consumer Group</AiChip>
-      <AiChip hi>AI 대화 Lock</AiChip>
-    </ValkeyCard>
-    <SmallNote left={120} width={800} title="적체 관측">
-      Stream Lag, Pending, 대기시간을 따로 관측하고
-      <br />
-      적체되면 Worker를 확장
-    </SmallNote>
-    <ResultBand left={1000} top={772} width={800} height={160}>
-      <PathArrow />
-      <span>
-        Queue 부하가 로그인과 일반 요청 경로로
-        <br />
-        번지는 범위 축소
-      </span>
+    <ValkeyRow top={392} name="Valkey A" lane="로그인, 요청 제어">
+      <ValkeyTile>OAuth 상태</ValkeyTile>
+      <ValkeyTile>Rate Limit, Cooldown</ValkeyTile>
+      <ValkeyTile>일반 Lock</ValkeyTile>
+    </ValkeyRow>
+    <ValkeyRow top={600} name="Valkey B" lane="AI 작업 대기열">
+      <ValkeyTile hi>Redis Stream</ValkeyTile>
+      <ValkeyTile hi>Consumer Group</ValkeyTile>
+      <ValkeyTile hi>AI 대화 Lock</ValkeyTile>
+    </ValkeyRow>
+    <ResultBand left={120} top={808} width={1680} height={110}>
+      <span style={{ padding: '6px 18px', borderRadius: 999, background: 'var(--osd-text)', color: '#FFFFFF', fontSize: 22, fontWeight: 800 }}>핵심 효과</span>
+      <span style={{ fontSize: 32, marginLeft: 8 }}>AI 작업 적체와 로그인, 요청 제어 부하 분리</span>
     </ResultBand>
-    <InfraBar current={0}>
-      <Status level="설계">Valkey A/B</Status>
-      <Status level="일부 구성 확인">Valkey 인프라, Worker 관측 규칙</Status>
-      <Status level="예정">부하, 장애 테스트</Status>
-    </InfraBar>
   </Slide>
 );
 
@@ -2732,7 +3024,7 @@ const CutRow = ({ top, n, title, children }: { top: number; n: string; title: Re
       padding: '0 32px 0 28px',
     }}
   >
-    <Num n={n} dark />
+    {n ? <Num n={n} dark /> : null}
     <div>
       <div style={{ fontSize: 28, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 12 }}>{title}</div>
       {children ? <div style={{ fontSize: 21, fontWeight: 500, color: muted, marginTop: 6 }}>{children}</div> : null}
@@ -2744,9 +3036,9 @@ const Was = ({ children }: { children: ReactNode }) => <span style={{ color: mut
 
 const ClCutover: Page = () => (
   <Slide>
-    <InfraHead part="② 데이터 이전 V1 → V2">쓰기 제한 46분을 102초로</InfraHead>
+    <InfraHead part="② 데이터 이전 V1 → V2">마이그레이션 중 DB 쓰기가 막힌 46분을 102초로</InfraHead>
     <WideProblem top={268} height={96}>
-      DNS 전환과 수동 작업 때문에 초기 쓰기 제한이 46분 이상 이어졌습니다.
+      EC2 → RDS 이전 중, 수동 작업으로 DB 쓰기가 46분 넘게 멈춤
     </WideProblem>
     <div
       style={{
@@ -2761,10 +3053,11 @@ const ClCutover: Page = () => (
         padding: '36px 44px',
         display: 'flex',
         flexDirection: 'column',
+        justifyContent: 'center',
       }}
     >
-      <span style={{ fontSize: 24, fontWeight: 700, color: muted }}>쓰기 제한 시간</span>
-      <span style={{ fontSize: 46, fontWeight: 800, color: muted, fontFamily: 'var(--osd-font-display)', letterSpacing: track.display, marginTop: 20 }}>46분 35초 이상</span>
+      <span style={{ fontSize: 24, fontWeight: 700, color: muted }}>DB 쓰기가 막힌 시간</span>
+      <span style={{ fontSize: 46, fontWeight: 800, color: muted, fontFamily: 'var(--osd-font-display)', letterSpacing: track.display, marginTop: 28 }}>46분 35초 이상</span>
       <span style={{ marginTop: 14 }}>
         <DownArrow />
       </span>
@@ -2772,23 +3065,18 @@ const ClCutover: Page = () => (
         <span style={{ fontSize: 150, fontWeight: 800, lineHeight: 1 }}>102</span>
         <span style={{ fontSize: 48, fontWeight: 800 }}>초</span>
       </span>
-      <span style={{ fontSize: 26, fontWeight: 700, marginTop: 10 }}>일반 쓰기 102초, 인증 103초</span>
-      <span style={{ fontSize: 21, fontWeight: 500, color: muted, marginTop: 'auto', lineHeight: 1.5 }}>DMS CDC와 짧은 Write Gate는 유지한 채 전환 절차를 단계적으로 개선</span>
     </div>
-    <CutRow top={392} n="1" title={<><Was>DNS 변경</Was><PathArrow />ALB Listener Rule Weight 전환</>} />
+    <CutRow top={392} n="1" title={<><Was>DNS 변경</Was><PathArrow />ALB 가중치 전환</>} />
     <CutRow top={532} n="2" title={<><Was>Nginx Freeze</Was><PathArrow />ALB Write Gate</>} />
-    <CutRow top={672} n="3" title="사전 준비">PostgreSQL 사전 적재, V2 ECS와 Target 사전 기동</CutRow>
+    <CutRow top={672} n="3" title="사전 준비">RDS MySQL, PostgreSQL 사전 적재, V2 사전 기동</CutRow>
     <CutRow top={812} n="4" title="전환 절차 자동화">DMS 중지, DB 검증, ALB 전환, Gate 해제</CutRow>
-    <InfraBar current={1}>
-      <Status level="한계">쓰기와 인증이 102~103초 제한됐으므로 무중단 전환은 아님</Status>
-    </InfraBar>
   </Slide>
 );
 
 /* ── ② 데이터 이전 2: GitHub Actions 검증 ── */
 
-const Evidence = ({ label, value, unit }: { label: string; value: string; unit?: string }) => (
-  <div style={{ ...card, height: 150, padding: '22px 30px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+const Evidence = ({ label, value, unit, height = 150 }: { label: string; value: string; unit?: string; height?: number }) => (
+  <div style={{ ...card, height, padding: '22px 30px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
     <span style={{ fontSize: 21, fontWeight: 700, color: muted, whiteSpace: 'nowrap' }}>{label}</span>
     <span style={{ display: 'flex', alignItems: 'baseline', gap: 8, fontFamily: 'var(--osd-font-display)', letterSpacing: track.display, whiteSpace: 'nowrap' }}>
       <span style={{ fontSize: 52, fontWeight: 800, lineHeight: 1 }}>{value}</span>
@@ -2822,17 +3110,21 @@ const WeightBar = ({ v1, v2, caption }: { v1: number; v2: number; caption: strin
   </div>
 );
 
+const NoteTile = ({ title, children }: { title: string; children: ReactNode }) => (
+  <div style={{ ...card, height: 140, padding: '22px 30px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+    <span style={{ fontSize: 26, fontWeight: 800 }}>{title}</span>
+    <span style={{ fontSize: 22, fontWeight: 500, color: muted, whiteSpace: 'nowrap' }}>{children}</span>
+  </div>
+);
+
 const ClVerify: Page = () => (
   <Slide>
-    <InfraHead part="② 데이터 이전 V1 → V2">DNS 변경 없이 V1에서 V2로</InfraHead>
-    <WideProblem top={268} height={96}>
-      수동 명령과 사후 확인만으로는 누락과 복구 여부를 판단하기 어려웠습니다.
-    </WideProblem>
+    <InfraHead part="② 데이터 이전 V1 → V2">수동 DNS 변경 없이 워크플로우로 V1에서 V2로 전환</InfraHead>
     <div
       style={{
         position: 'absolute',
         left: 120,
-        top: 392,
+        top: 268,
         width: 1680,
         height: 190,
         ...card,
@@ -2867,15 +3159,47 @@ const ClVerify: Page = () => (
         <WeightBar caption="전환 후" v1={0} v2={100} />
       </span>
     </div>
-    <Box left={120} top={610} width={1680} style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 20 }}>
-      <Evidence label="Production Preflight" value="20/20" unit="PASS" />
-      <Evidence label="관측 구간 요청" value="2,727" unit="건" />
-      <Evidence label="요청이 0인 1분 구간" value="0" unit="개" />
-      <Evidence label="Unhealthy Target" value="0" unit="개" />
-      <Evidence label="Target 5xx, 연결 오류, ALB 연결 거부" value="미관측" />
-      <Evidence label="DMS Validation Pending/Failed" value="0" unit="건" />
+    <Box left={120} top={480} width={1080} style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 20 }}>
+      <Evidence height={140} label="Production Preflight" value="20/20" unit="PASS" />
+      <Evidence height={140} label="관측 구간 요청" value="2,727" unit="건" />
+      <Evidence height={140} label="Unhealthy Target" value="0" unit="개" />
+      <Evidence height={140} label="DMS 검증 대기, 실패" value="0" unit="건" />
+      <NoteTile title="전환 이전">ALB 5xx 1건, TLS 협상 오류 6건</NoteTile>
+      <NoteTile title="전환 이후">Target 5xx 및 연결 오류 미관측</NoteTile>
     </Box>
-    <InfraBar current={1} />
+    <div
+      style={{
+        position: 'absolute',
+        left: 1230,
+        top: 480,
+        width: 570,
+        height: 460,
+        boxSizing: 'border-box',
+        borderRadius: 'var(--osd-radius)',
+        background: 'var(--osd-text)',
+        color: '#FFFFFF',
+        padding: '36px 42px',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <span style={{ fontSize: 26, fontWeight: 800 }}>SLO로 환산하면</span>
+      <span style={{ fontSize: 22, fontWeight: 500, color: 'rgba(255,255,255,0.7)', marginTop: 18, lineHeight: 1.6 }}>
+        99% 월간 오류 예산 <b style={{ color: '#FFFFFF' }}>25,920초</b>
+        <br />
+        103초 ÷ 25,920초 = <b style={{ color: '#FFFFFF' }}>0.397%</b>
+      </span>
+      <span style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginTop: 'auto', fontFamily: 'var(--osd-font-display)', letterSpacing: track.display, color: 'var(--osd-accent)' }}>
+        <span style={{ fontSize: 40, fontWeight: 800 }}>약</span>
+        <span style={{ fontSize: 130, fontWeight: 800, lineHeight: 1 }}>0.4</span>
+        <span style={{ fontSize: 56, fontWeight: 800 }}>%</span>
+      </span>
+      <span style={{ fontSize: 25, fontWeight: 700, lineHeight: 1.5, marginTop: 'auto' }}>
+        월 오류 예산의 약 0.4%로
+        <br />
+        <span style={{ color: 'var(--osd-accent)' }}>V2 SLO 충족</span>
+      </span>
+    </div>
   </Slide>
 );
 
@@ -2943,7 +3267,6 @@ const ClLimits: Page = () => (
         월 오류 예산의 약 0.4% 규모
       </span>
     </div>
-    <InfraBar current={1} />
   </Slide>
 );
 
@@ -2953,7 +3276,6 @@ const Ch04: Page = () => (
   <Divider n="04" title="프로젝트 결과">
     <SubItem n="01">숫자로 보는 니쥬</SubItem>
     <SubItem n="02">사용 추이</SubItem>
-    <SubItem n="03">목표 달성도</SubItem>
   </Divider>
 );
 
@@ -2968,7 +3290,7 @@ const Ring = ({ n, title, value, unit, children }: { n: string; title: string; v
         marginTop: 32,
         borderRadius: '50%',
         boxSizing: 'border-box',
-        border: '30px solid var(--osd-accent)',
+        border: 'none',
         background: surface,
         display: 'flex',
         alignItems: 'baseline',
@@ -2990,14 +3312,20 @@ const Numbers: Page = () => (
       숫자로 보는 니쥬
     </Head>
     <Box left={120} top={300} width={1680} style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24 }}>
-      <Ring n="1" title="누적 가입자" value={<Fill>000</Fill>} unit="명">
-        <Fill>기간, 집계 기준</Fill>
+      <Ring n="1" title="누적 가입자" value="81" unit="명">
+        테스트·평가 계정 제외
+        <br />
+        탈퇴 포함
       </Ring>
-      <Ring n="2" title="누적 대화" value={<Fill>000</Fill>} unit="회">
-        <Fill>1인당 평균 턴 수</Fill>
+      <Ring n="2" title="누적 대화" value="311" unit="개">
+        AI 대화 298개
+        <br />
+        익명 채팅 13개
       </Ring>
-      <Ring n="3" title="생성된 추천" value={<Fill>000</Fill>} unit="건">
-        <Fill>나를 위한 추천, 선물 추천</Fill>
+      <Ring n="3" title="누적 메시지" value="2,055" unit="건">
+        대화 1개당
+        <br />
+        평균 약 6.6건
       </Ring>
       <Ring n="4" title="상품 카탈로그" value="7,969" unit="개">
         상품마다 설명 문서 3종과 벡터
@@ -3006,138 +3334,49 @@ const Numbers: Page = () => (
   </Slide>
 );
 
-/* 추이 그래프: values를 비워 두면 입력 안내가 표시됩니다. */
-
-const TrendChart = ({ labels, values }: { labels: string[]; values?: number[] }) => {
-  const W = 1400;
-  const Hh = 560;
-  const x0 = 140;
-  const x1 = W - 80;
-  const y0 = 470;
-  const y1 = 60;
-  const step = (x1 - x0) / (labels.length - 1);
-  const max = values && values.length ? Math.max(...values) * 1.15 : 1;
-  const pts = values?.map((v, i) => [x0 + i * step, y0 - (v / max) * (y0 - y1)] as const);
-  const d = pts?.map(([x, y], i) => `${i ? 'L' : 'M'} ${x} ${y}`).join(' ');
-  return (
-    <svg width={W} height={Hh} aria-hidden="true">
-      {[0, 1, 2, 3].map((k) => (
-        <line key={k} x1={x0} x2={x1} y1={y0 - (k * (y0 - y1)) / 3} y2={y0 - (k * (y0 - y1)) / 3} stroke={line} strokeWidth="2" />
-      ))}
-      <line x1={x0} x2={x1} y1={y0} y2={y0} stroke="#151515" strokeWidth="3" />
-      {labels.map((l, i) => (
-        <text key={l} x={x0 + i * step} y={y0 + 50} textAnchor="middle" fontSize="26" fontWeight="700" fill="#151515">
-          {l}
-        </text>
-      ))}
-      {pts && d ? (
-        <>
-          <path d={`${d} L ${pts[pts.length - 1][0]} ${y0} L ${x0} ${y0} Z`} fill="#FEE500" opacity="0.55" />
-          <path d={d} fill="none" stroke="#151515" strokeWidth="4" />
-          {pts.map(([x, y], i) => (
-            <g key={i}>
-              <circle cx={x} cy={y} r="9" fill="#151515" />
-              <text x={x} y={y - 24} textAnchor="middle" fontSize="28" fontWeight="800" fill="#151515">
-                {values![i].toLocaleString()}
-              </text>
-            </g>
-          ))}
-        </>
-      ) : (
-        <>
-          <path d={`M ${x0} ${y0 - 120} L ${x1} ${y0 - 260}`} stroke={muted} strokeWidth="4" strokeDasharray="12 12" />
-          <text x={(x0 + x1) / 2} y={y1 + 60} textAnchor="middle" fontSize="28" fontWeight="700" fill={muted}>
-            주차별 수치를 입력하세요 — TrendChart의 values
-          </text>
-        </>
-      )}
-    </svg>
-  );
-};
-
-const Trend: Page = () => (
-  <Slide>
-    <Head chapter="04 프로젝트 결과">
-      주차별 <Fill>지표명 (예: 대화 수)</Fill>
-    </Head>
-    <div style={{ position: 'absolute', left: 260, top: 300, width: 1400, height: 640, ...card, paddingTop: 40 }}>
-      <TrendChart labels={['1주차', '3주차', '5주차', '7주차', '9주차', '11주차']} />
+const TrendStat = ({ label, value, unit }: { label: string; value: string; unit?: string }) => (
+  <div style={{ background: surface, borderRadius: 24, padding: '22px 26px', boxSizing: 'border-box' }}>
+    <div style={{ fontSize: 20, fontWeight: 700, color: muted }}>{label}</div>
+    <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 6, fontFamily: 'var(--osd-font-display)', letterSpacing: track.display }}>
+      <span style={{ fontSize: 56, fontWeight: 800, lineHeight: 1.05 }}>{value}</span>
+      {unit ? <span style={{ fontSize: 24, fontWeight: 800 }}>{unit}</span> : null}
     </div>
-  </Slide>
-);
-
-const GoalRow = ({ name, stage, status }: { name: ReactNode; stage: ReactNode; status: 'done' | 'partial' | 'todo' }) => (
-  <div
-    style={{
-      height: 70,
-      boxSizing: 'border-box',
-      borderRadius: 20,
-      background: status === 'todo' ? 'transparent' : surface,
-      border: status === 'todo' ? `3px dashed ${muted}` : `2px solid ${line}`,
-      display: 'grid',
-      gridTemplateColumns: '1fr 260px 140px',
-      alignItems: 'center',
-      padding: '0 28px',
-    }}
-  >
-    <span style={{ fontSize: 27, fontWeight: 800 }}>{name}</span>
-    <span style={{ fontSize: 22, fontWeight: 600, color: muted }}>{stage}</span>
-    <span
-      style={{
-        justifySelf: 'end',
-        borderRadius: 999,
-        padding: '4px 18px',
-        fontSize: 21,
-        fontWeight: 800,
-        background: status === 'done' ? 'var(--osd-text)' : status === 'partial' ? 'var(--osd-accent)' : 'transparent',
-        color: status === 'done' ? '#FFFFFF' : status === 'partial' ? 'var(--osd-text)' : muted,
-        border: status === 'todo' ? `2px solid ${muted}` : 'none',
-      }}
-    >
-      {status === 'done' ? '완료' : status === 'partial' ? '부분' : '미완'}
-    </span>
   </div>
 );
 
-const Goals: Page = () => (
+const TrendPoint = ({ n, children }: { n: string; children: ReactNode }) => (
+  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, fontSize: 23, fontWeight: 600, lineHeight: 1.5 }}>
+    <span style={{ flex: 'none', marginTop: 2 }}>
+      <Num n={n} />
+    </span>
+    <span>{children}</span>
+  </div>
+);
+
+const Trend: Page = () => (
   <Slide>
-    <Head chapter="04 프로젝트 결과">목표 달성도</Head>
-    <div
-      style={{
-        position: 'absolute',
-        left: 120,
-        top: 300,
-        width: 500,
-        height: 650,
-        boxSizing: 'border-box',
-        borderRadius: 48,
-        background: 'var(--osd-accent)',
-        padding: '52px 44px',
-      }}
-    >
-      <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: track.label, fontFamily: 'var(--osd-font-display)' }}>기능정의서 기준</div>
-      <div style={{ fontSize: 140, fontWeight: 800, fontFamily: 'var(--osd-font-display)', letterSpacing: track.display, marginTop: 40, lineHeight: 1 }}>
-        <Fill>○○%</Fill>
-      </div>
-      <div style={{ fontSize: 32, fontWeight: 800, marginTop: 24 }}>목표 기능 달성률</div>
-      <div style={{ fontSize: 24, fontWeight: 500, marginTop: 40, lineHeight: 1.7 }}>
-        1차 배포 → 2차 배포
-        <br />
-        needu.gift, 카카오 로그인
-        <br />
-        <Fill>완료 ○ / 전체 ○개</Fill>
-      </div>
+    <Head chapter="04 프로젝트 결과">애널리틱스로 보는 사용 추이</Head>
+    <div style={{ position: 'absolute', left: 120, top: 262, width: 860, height: 740, boxSizing: 'border-box', borderRadius: 28, background: surface, padding: 20 }}>
+      <img src={ga4Pages} alt="GA4 페이지 경로별 조회수" style={{ display: 'block', width: '100%', height: '100%', objectFit: 'contain' }} />
     </div>
-    <Box left={660} top={300} width={1140} style={{ display: 'grid', gap: 10 }}>
-      <GoalRow name="대화형 취향 발견" stage={<Fill>목표 단계</Fill>} status="done" />
-      <GoalRow name="취향 확인, 수정" stage={<Fill>목표 단계</Fill>} status="done" />
-      <GoalRow name="나를 위한 추천" stage={<Fill>목표 단계</Fill>} status="done" />
-      <GoalRow name="친구 선물 추천" stage={<Fill>목표 단계</Fill>} status="done" />
-      <GoalRow name="예산 조절" stage={<Fill>목표 단계</Fill>} status="done" />
-      <GoalRow name="추천 이유" stage={<Fill>목표 단계</Fill>} status="done" />
-      <GoalRow name={<Fill>부분 완료 기능</Fill>} stage={<Fill>남은 부분</Fill>} status="partial" />
-      <GoalRow name={<Fill>미완 기능</Fill>} stage={<Fill>못 한 이유 한 줄</Fill>} status="todo" />
+    <Box left={1010} top={262} width={790} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+      <TrendStat label="총 조회수" value="31,212" unit="회" />
+      <TrendStat label="활성 사용자" value="697" unit="명" />
+      <TrendStat label="사용자당 평균 참여" value="5분 09초" />
+      <TrendStat label="총 이벤트" value="53,077" unit="건" />
     </Box>
+    <div style={{ position: 'absolute', left: 1010, top: 590, width: 790, height: 412, boxSizing: 'border-box', borderRadius: 28, background: 'var(--osd-text)', color: '#FFFFFF', padding: '32px 34px', display: 'grid', alignContent: 'start', gap: 22 }}>
+      <span style={{ fontSize: 20, fontWeight: 800, color: 'var(--osd-accent)' }}>GA4 · 10월 ~ 11월 일별 조회수</span>
+      <TrendPoint n="1">
+        메인(/) 다음으로 <b style={{ color: 'var(--osd-accent)' }}>친구 페이지(/friends)</b>가 5,433회로 2위
+      </TrendPoint>
+      <TrendPoint n="2">
+        AI 대화(/ai, /chat)는 사용자당 <b style={{ color: 'var(--osd-accent)' }}>평균 3~4분</b> 머묾
+      </TrendPoint>
+      <TrendPoint n="3">
+        10월 중순 일 조회수 <b style={{ color: 'var(--osd-accent)' }}>약 3천 회</b>로 최고점
+      </TrendPoint>
+    </div>
   </Slide>
 );
 
@@ -3145,160 +3384,485 @@ const Goals: Page = () => (
 
 const Ch05: Page = () => (
   <Divider n="05" title={<>활용방안 및<br />기대효과</>}>
-    <SubItem n="01">사용자 경험의 변화</SubItem>
-    <SubItem n="02">기능, 외부 확장 방향</SubItem>
+    <SubItem n="01">니쥬의 확장 가능성</SubItem>
   </Divider>
 );
 
-const Effect = ({ left, top, title, children }: { left: number; top: number; title: string; children: ReactNode }) => (
+/* ── 확장 가능성 ── */
+
+const ExpandCard = ({ tag, hi, title, children }: { tag: string; hi?: boolean; title: string; children: ReactNode }) => (
   <div
     style={{
-      position: 'absolute',
-      left,
-      top,
-      width: 540,
-      height: 200,
+      height: 236,
       ...card,
       border: '2.5px solid var(--osd-text)',
-      boxShadow: '10px 10px 0 rgba(21,21,21,0.12)',
-      padding: '0 36px',
+      boxShadow: hi ? '10px 10px 0 var(--osd-accent)' : 'none',
+      padding: '30px 34px',
       display: 'flex',
       flexDirection: 'column',
-      justifyContent: 'center',
-      textAlign: 'center',
     }}
   >
-    <div style={{ fontSize: 32, fontWeight: 800 }}>{title}</div>
-    <div style={{ fontSize: 25, fontWeight: 500, marginTop: 12, lineHeight: 1.5 }}>{children}</div>
+    <span
+      style={{
+        alignSelf: 'flex-start',
+        padding: '4px 14px',
+        borderRadius: 999,
+        background: hi ? 'var(--osd-accent)' : 'rgba(21,21,21,0.07)',
+        fontSize: 19,
+        fontWeight: 800,
+      }}
+    >
+      {tag}
+    </span>
+    <span style={{ fontSize: 34, fontWeight: 800, letterSpacing: track.display, marginTop: 18 }}>{title}</span>
+    <span style={{ fontSize: 23, fontWeight: 500, color: muted, lineHeight: 1.5, marginTop: 'auto' }}>{children}</span>
   </div>
 );
 
-const Utilization: Page = () => (
+const Expansion: Page = () => (
   <Slide>
+    <Head chapter="05 활용방안 및 기대효과" width={1400}>
+      니쥬의 확장 가능성
+    </Head>
+    <img src={mascot} alt="" style={{ position: 'absolute', left: 1620, top: 70, width: 180, rotate: '8deg' }} />
     <div
       style={{
         position: 'absolute',
-        left: 0,
-        top: 660,
-        width: 1920,
-        height: 420,
-        background: 'var(--osd-accent)',
-        borderRadius: '50% 50% 0 0 / 120px 120px 0 0',
+        left: 120,
+        top: 280,
+        width: 1680,
+        height: 120,
+        boxSizing: 'border-box',
+        borderRadius: 28,
+        background: 'var(--osd-text)',
+        color: '#FFFFFF',
+        padding: '0 40px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 28,
       }}
-    />
-    <Head chapter="05 활용방안 및 기대효과">
-      니쥬를 통한 경험의 변화
-    </Head>
-    <Phone width={320} left={800} top={330}>
-      <img src={screenHome} alt="" style={{ display: 'block', width: '100%', aspectRatio: '860 / 1794', objectFit: 'contain', borderRadius: 31.6, background: surface, objectPosition: '50% 50%' }} />
-    </Phone>
-    <Effect left={140} top={340} title="나를 위한 선택">
-      취향을 설명하지 못해도
-      <br />
-      대화만으로 나에게 맞는 상품
-    </Effect>
-    <Effect left={1240} top={340} title="선물하는 사람">
-      친구 취향을 몰라도
-      <br />
-      받으면 기쁜 선물을 고름
-    </Effect>
-    <Effect left={140} top={720} title="기능 확장">
-      반응으로 나아지는 추천
-      <br />
-      상황과 목적을 읽는 추천
-    </Effect>
-    <Effect left={1240} top={720} title="외부 확장">
-      상품을 넘어 경험 추천으로
-      <br />
-      <Fill>제휴, B2B 등 확장 대상</Fill>
-    </Effect>
+    >
+      <span style={{ fontSize: 28, fontWeight: 600, lineHeight: 1.45 }}>
+        개성을 찾는 이유는 세상 속에서 <b style={{ color: 'var(--osd-accent)' }}>소셜적인 가치</b>를 갖기 위해서입니다.
+      </span>
+      <span style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 14, whiteSpace: 'nowrap' }}>
+        <span style={{ padding: '10px 22px', borderRadius: 999, background: 'var(--osd-accent)', color: 'var(--osd-text)', fontSize: 26, fontWeight: 800 }}>
+          커머스 + 소셜 서비스를 결합한 플랫폼
+        </span>
+      </span>
+    </div>
+    <Box left={120} top={432} width={1680} style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 24 }}>
+      <ExpandCard hi tag="커머스" title="취향 맞춤 작품, 티켓">
+        상품을 넘어 공연, 영화처럼
+        <br />
+        취향에 맞는 경험을 추천
+      </ExpandCard>
+      <ExpandCard hi tag="커머스" title="취향 기반 공동 구매">
+        유튜브를 즐기는 사람끼리
+        <br />
+        유튜브 프리미엄 같은 콘텐츠 공동 구매
+      </ExpandCard>
+      <ExpandCard hi tag="커머스" title="캘린더 기념일 확장">
+        생일을 넘어 입학, 졸업, 기념일, 명절, 집들이
+        <br />
+        친구가 등록한 일정으로 추천 리스트 생성
+      </ExpandCard>
+      <ExpandCard tag="소셜" title="취향 매칭 커뮤니티">
+        취향과 관심사가 맞는
+        <br />
+        사람들끼리 연결
+      </ExpandCard>
+      <ExpandCard tag="소셜" title="취향 궁합, 공유">
+        친구와 취향이 얼마나 겹치는지
+        <br />
+        궁합으로 비교하고 공유
+      </ExpandCard>
+      <ExpandCard tag="B2B" title="브랜드와 고객 연결">
+        분석한 사용자 취향으로
+        <br />
+        브랜드에 맞는 고객을 연결
+      </ExpandCard>
+    </Box>
   </Slide>
 );
 
-/* ───────────────────────── 06 Review ───────────────────────── */
+/* ───────────────────────── 06 Competitors ───────────────────────── */
 
-const Ch06: Page = () => <Divider n="06" title={<>자체 평가 의견<br />및 후기</>} />;
+const Ch06: Page = () => (
+  <Divider n="06" title={<>경쟁 서비스<br />비교</>}>
+    <SubItem n="01">AI 기능 비교</SubItem>
+    <SubItem n="02">사용자 니즈 파악</SubItem>
+    <SubItem n="03">니쥬의 차별점</SubItem>
+  </Divider>
+);
 
-const Quote = ({ tag, children }: { tag: string; children: ReactNode }) => (
-  <div style={{ ...card, height: 600, padding: '48px 44px', boxShadow: '0 30px 60px rgba(21,21,21,0.06)', display: 'flex', flexDirection: 'column' }}>
-    <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
-      <span
+/** 제목 속 형광펜 강조 */
+const Hl = ({ children }: { children: ReactNode }) => (
+  <span style={{ backgroundImage: markBg, backgroundSize: '100% 100%' }}>{children}</span>
+);
+
+const SourceNote = ({ children }: { children: ReactNode }) => (
+  <div style={{ position: 'absolute', left: 120, top: 1000, width: 1680, fontSize: 17, fontWeight: 500, color: muted }}>{children}</div>
+);
+
+/* ── 공통: 표 스타일 ── */
+
+const thStyle: CSSProperties = { fontSize: 19, fontWeight: 700, color: muted };
+
+/* ── 01 AI 기능 비교 ──
+ * 템플릿: 머리말 + 한 줄 설명 + 노란 강조 카드(니쥬) + 흰 카드 표(나머지 서비스) */
+
+const aiCols = '320px 660px minmax(0, 1fr) 140px';
+
+const AIRow = ({
+  name,
+  feature,
+  data,
+  ctx,
+  ctxTone,
+  last,
+}: {
+  name: string;
+  feature: ReactNode;
+  data: string;
+  ctx: string;
+  ctxTone?: 'dim';
+  last?: boolean;
+}) => (
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: aiCols,
+      alignItems: 'center',
+      height: 72,
+      borderBottom: last ? 'none' : `2px solid ${line}`,
+    }}
+  >
+    <span style={{ fontSize: 24, fontWeight: 800 }}>{name}</span>
+    <span style={{ fontSize: 21, fontWeight: 500, color: '#444444' }}>{feature}</span>
+    <span style={{ fontSize: 21, fontWeight: 500, color: '#444444' }}>{data}</span>
+    <span style={{ fontSize: 21, fontWeight: ctxTone === 'dim' ? 500 : 800, color: ctxTone === 'dim' ? '#B5AF9C' : 'var(--osd-text)' }}>{ctx}</span>
+  </div>
+);
+
+const CompAI: Page = () => (
+  <Slide>
+    <Head chapter="06 경쟁 서비스 비교 · AI 기능" width={1680}>
+      니쥬의 AI는 ‘취향을 정하는 단계’부터 맡습니다
+    </Head>
+    <SubLine>
+      기존 AI는 대부분 <b style={{ color: 'var(--osd-text)', fontWeight: 800 }}>‘고르는 단계’</b>(후보 추천, 상품 요약·비교)를 돕습니다.
+    </SubLine>
+    <div style={{ position: 'absolute', left: 160, top: 340, width: 1600, display: 'grid', gridTemplateColumns: aiCols, ...thStyle }}>
+      <span>서비스</span>
+      <span>핵심 AI 기능</span>
+      <span>추천 근거</span>
+      <span>선물 맥락</span>
+    </div>
+    <div
+      style={{
+        position: 'absolute',
+        left: 120,
+        top: 380,
+        width: 1680,
+        height: 100,
+        boxSizing: 'border-box',
+        borderRadius: 28,
+        background: 'var(--osd-accent)',
+        padding: '0 40px',
+        display: 'grid',
+        gridTemplateColumns: aiCols,
+        alignItems: 'center',
+      }}
+    >
+      <span style={{ fontSize: 30, fontWeight: 800, fontFamily: 'var(--osd-font-display)', letterSpacing: track.display }}>니쥬</span>
+      <span style={{ fontSize: 22, fontWeight: 800 }}>대화로 취향 확정 → 나·친구 맞춤 추천 + 추천 이유</span>
+      <span style={{ fontSize: 22, fontWeight: 800 }}>본인·친구가 확정한 취향</span>
+      <span style={{ fontSize: 22, fontWeight: 800 }}>강함</span>
+    </div>
+    <div style={{ position: 'absolute', left: 120, top: 504, width: 1680, ...card, padding: '8px 40px' }}>
+      <AIRow name="카카오 선물하기" feature="AI 선물 후보 추천, 상품 요약 태그" data="위시리스트, 선물 이력" ctx="강함" />
+      <AIRow name="네이버 선물하기" feature="대화형 선물·쇼핑 에이전트" data="검색·리뷰 데이터, 보내는 사람 설명" ctx="강함" />
+      <AIRow name="카나나" feature="대화 맥락을 읽고 먼저 제안(선톡)" data="카톡 대화, 생일·기념일" ctx="중간" />
+      <AIRow name="29CM" feature="클릭·좋아요 기반 추천" data="클릭·좋아요 기록" ctx="약함" ctxTone="dim" />
+      <AIRow name="컬리" feature="검색 시 취향 질문 후 추천 (베타)" data="검색어 + 질문 답변" ctx="없음" ctxTone="dim" />
+      <AIRow last name="쿠팡" feature="상세페이지 AI 요약·비교" data="탐색 기록, 상품 스펙" ctx="없음" ctxTone="dim" />
+    </div>
+    <SourceNote>2026년 11월까지의 공식 보도자료·기사 기준</SourceNote>
+  </Slide>
+);
+
+/* ── 02 사용자 니즈 파악 ──
+ * 템플릿: 흰 카드 표 + 노란 니쥬 열 + 검은 요약 카드 */
+
+type MarkKind = 'o' | 'tri' | 'x' | 'q';
+
+const Mark = ({ k }: { k: MarkKind }) => (
+  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    {k === 'o' ? (
+      <span style={{ width: 26, height: 26, borderRadius: '50%', border: '4px solid var(--osd-text)', boxSizing: 'border-box' }} />
+    ) : k === 'tri' ? (
+      <span style={{ width: 0, height: 0, borderLeft: '13px solid transparent', borderRight: '13px solid transparent', borderBottom: '22px solid #B5AF9C' }} />
+    ) : k === 'x' ? (
+      <span style={{ fontSize: 22, fontWeight: 500, color: '#CFC9B6' }}>✕</span>
+    ) : (
+      <span style={{ fontSize: 22, fontWeight: 800, color: '#A39E90' }}>?</span>
+    )}
+  </div>
+);
+
+const needCols = '56px 330px 150px repeat(6, minmax(0, 1fr))';
+const needRowH = 72;
+const needHeadH = 60;
+const needTop = 280;
+const needW = 1300;
+const needPad = 32;
+
+const needRows: { title: string; marks: MarkKind[] }[] = [
+  { title: '취향 몰라도 시작 가능', marks: ['tri', 'tri', 'x', 'tri', 'tri', 'tri'] },
+  { title: '대화로 니즈 파악', marks: ['tri', 'o', 'x', 'tri', 'x', 'o'] },
+  { title: '취향 프로필 확인', marks: ['tri', 'x', 'x', 'x', 'tri', 'x'] },
+  { title: '친구 취향 반영', marks: ['o', 'tri', 'x', 'x', 'x', 'tri'] },
+  { title: '받는 사람이 확정한 취향', marks: ['tri', 'x', 'x', 'x', 'x', 'x'] },
+  { title: '‘왜 나에게 맞는지’ 설명', marks: ['tri', 'q', 'tri', 'tri', 'x', 'tri'] },
+  { title: '공개 범위 제어 (숨기기)', marks: ['q', 'x', 'x', 'x', 'x', 'x'] },
+  { title: '익명으로 의사 확인', marks: ['x', 'x', 'x', 'x', 'x', 'x'] },
+];
+
+const MarkLegend = ({ k, children }: { k: MarkKind; children: ReactNode }) => (
+  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}>
+    <span style={{ transform: 'scale(0.75)', display: 'inline-flex' }}>
+      <Mark k={k} />
+    </span>
+    {children}
+  </span>
+);
+
+const CompNeeds: Page = () => {
+  const tableH = needHeadH + needRowH * needRows.length;
+  return (
+    <Slide>
+      <Head chapter="06 경쟁 서비스 비교 · 사용자 니즈 파악" width={1680}>
+        8개 기준 중 니쥬만 <Hl>8개를 모두 충족</Hl>합니다
+      </Head>
+      {/* 표 카드 */}
+      <div style={{ position: 'absolute', left: 120, top: needTop, width: needW, height: tableH + needPad * 2, ...card }} />
+      {/* 니쥬 열 */}
+      <div
         style={{
-          width: 72,
-          height: 72,
-          borderRadius: '50%',
+          position: 'absolute',
+          left: 120 + needPad + 56 + 330,
+          top: needTop + 12,
+          width: 150,
+          height: tableH + needPad * 2 - 24,
+          borderRadius: 20,
           background: 'var(--osd-accent)',
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: 80,
-          fontWeight: 800,
-          lineHeight: 1,
-          paddingTop: 28,
+        }}
+      />
+      <div style={{ position: 'absolute', left: 120 + needPad, top: needTop + needPad, width: needW - needPad * 2 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: needCols, height: needHeadH, alignItems: 'center' }}>
+          <span style={{ ...thStyle, gridColumn: 'span 2' }}>판단 기준</span>
+          <span style={{ textAlign: 'center', fontSize: 24, fontWeight: 800, fontFamily: 'var(--osd-font-display)' }}>니쥬</span>
+          {['카카오', '카나나', '쿠팡', '컬리', '29CM', '네이버'].map((s) => (
+            <span key={s} style={{ ...thStyle, textAlign: 'center' }}>
+              {s}
+            </span>
+          ))}
+        </div>
+        {needRows.map((r, i) => (
+          <div key={r.title} style={{ display: 'grid', gridTemplateColumns: needCols, height: needRowH, alignItems: 'center', borderTop: `2px solid ${line}` }}>
+            <span style={{ fontSize: 19, fontWeight: 800, color: '#A39E90', fontFamily: 'var(--osd-font-display)' }}>{i + 1}</span>
+            <span style={{ fontSize: 23, fontWeight: 700 }}>{r.title}</span>
+            <Mark k="o" />
+            {r.marks.map((m, j) => (
+              <Mark key={j} k={m} />
+            ))}
+          </div>
+        ))}
+      </div>
+
+      {/* 요약 카드 */}
+      <div
+        style={{
+          position: 'absolute',
+          left: 1450,
+          top: needTop,
+          width: 350,
+          height: tableH + needPad * 2,
           boxSizing: 'border-box',
-          fontFamily: 'Georgia, serif',
+          borderRadius: 'var(--osd-radius)',
+          background: 'var(--osd-text)',
+          color: '#FFFFFF',
+          padding: '56px 44px',
+          display: 'flex',
+          flexDirection: 'column',
         }}
       >
-        “
-      </span>
-      <span style={{ fontSize: 30, fontWeight: 800 }}>{tag}</span>
-    </div>
-    <div style={{ fontSize: 27, fontWeight: 500, lineHeight: 1.65, marginTop: 36, flex: 1 }}>{children}</div>
-    <div style={{ fontSize: 22, fontWeight: 700, color: muted }}>
-      <Fill>이름, 스택</Fill>
-    </div>
+        <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--osd-accent)' }}>니쥬</div>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginTop: 8, fontFamily: 'var(--osd-font-display)', letterSpacing: track.display }}>
+          <span style={{ fontSize: 180, fontWeight: 800, lineHeight: 1, color: 'var(--osd-accent)' }}>8</span>
+          <span style={{ fontSize: 48, fontWeight: 800, color: '#8A8A8A' }}>/ 8</span>
+        </div>
+        <div style={{ height: 2, background: 'rgba(255,255,255,0.18)', margin: 'auto 0 40px' }} />
+        <div style={{ fontSize: 22, fontWeight: 700, color: '#BBBBBB' }}>기존 서비스 최대</div>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 8, fontFamily: 'var(--osd-font-display)', letterSpacing: track.display }}>
+          <span style={{ fontSize: 80, fontWeight: 800, lineHeight: 1 }}>1</span>
+          <span style={{ fontSize: 30, fontWeight: 800, color: '#8A8A8A' }}>/ 8</span>
+        </div>
+      </div>
+
+      <div style={{ position: 'absolute', left: 120, top: 994, display: 'flex', alignItems: 'center', gap: 28, fontSize: 17, fontWeight: 600, color: muted }}>
+        <MarkLegend k="o">제공</MarkLegend>
+        <MarkLegend k="tri">부분</MarkLegend>
+        <MarkLegend k="x">미제공</MarkLegend>
+        <MarkLegend k="q">확인 안 됨</MarkLegend>
+      </div>
+      <div style={{ position: 'absolute', left: 1000, top: 1000, width: 800, textAlign: 'right', fontSize: 17, fontWeight: 500, color: muted }}>
+        2026년 11월까지의 공식 보도자료·기사 기준
+      </div>
+    </Slide>
+  );
+};
+
+/* ── 03 차별점 ──
+ * 템플릿: 번호 원 + 흰 카드 행, 니쥬 쪽은 노란 칸 */
+
+const diffCols = '80px 420px minmax(0, 1fr) 56px 560px';
+
+const DiffRow = ({ n, title, before, after }: { n: string; title: string; before: string; after: ReactNode }) => (
+  <div
+    style={{
+      ...card,
+      height: 140,
+      padding: '0 16px 0 36px',
+      display: 'grid',
+      gridTemplateColumns: diffCols,
+      alignItems: 'center',
+    }}
+  >
+    <Num n={n} dark />
+    <span style={{ fontSize: 32, fontWeight: 800, letterSpacing: track.display }}>{title}</span>
+    <span style={{ fontSize: 23, fontWeight: 500, color: muted }}>{before}</span>
+    <PathArrow />
+    <span
+      style={{
+        height: 108,
+        boxSizing: 'border-box',
+        borderRadius: 24,
+        background: softYellow,
+        padding: '0 32px',
+        display: 'flex',
+        alignItems: 'center',
+        fontSize: 26,
+        fontWeight: 800,
+      }}
+    >
+      <span>{after}</span>
+    </span>
   </div>
 );
 
-const Review: Page = () => (
+const CompDiff: Page = () => (
   <Slide>
-    <Head chapter="06 자체 평가 의견 및 후기">자체 평가 의견 및 후기</Head>
-    <Box left={120} top={310} width={1680} style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 32 }}>
-      <Quote tag="잘한 점">
-        <Fill>목표 대비 잘 해낸 것과 그 근거 (3~4줄)</Fill>
-        <br />
-        강조할 한 구절
-      </Quote>
-      <Quote tag="아쉬운 점">
-        <Fill>부족했던 점과 원인 (3~4줄)</Fill>
-        <br />
-        강조할 한 구절
-      </Quote>
-      <Quote tag="앞으로">
-        <Fill>다음에 개선, 확장하고 싶은 것 (3~4줄)</Fill>
-        <br />
-        강조할 한 구절
-      </Quote>
-    </Box>
-  </Slide>
-);
-
-/* ───────────────────────── Demo and Q&A ───────────────────────── */
-
-const Demo: Page = () => (
-  <Slide>
-    <div
-      style={{
-        position: 'absolute',
-        left: 0,
-        top: 560,
-        width: 1920,
-        height: 520,
-        background: 'var(--osd-accent)',
-        borderRadius: '50% 50% 0 0 / 120px 120px 0 0',
-      }}
-    />
-    <Box left={120} top={100} width={1680} style={{ textAlign: 'center' }}>
-      <H size={72}>시연 영상</H>
-      <P size={28} style={{ marginTop: 14 }}>
-        로그인 → 대화 → 취향 확인 → 나를 위한 추천 → 선물 추천
-      </P>
-    </Box>
-    <div style={{ position: 'absolute', left: 400, top: 290, padding: 16, background: '#151515', borderRadius: 32, boxShadow: '0 30px 60px rgba(21,21,21,0.18)' }}>
-      <ImagePlaceholder hint="시연 영상 (MP4, 50초 이내) 또는 대표 캡처" width={1088} height={612} style={{ borderRadius: 20, background: surface }} />
+    <Head chapter="06 경쟁 서비스 비교 · 차별점" width={1680}>
+      니쥬는 <Hl>‘무엇을 원하는지’</Hl>부터 함께 찾습니다
+    </Head>
+    <div style={{ position: 'absolute', left: 120, top: 286, width: 1680, padding: '0 16px 0 36px', boxSizing: 'border-box', display: 'grid', gridTemplateColumns: diffCols, ...thStyle }}>
+      <span />
+      <span>차별점</span>
+      <span>기존 서비스</span>
+      <span />
+      <span style={{ paddingLeft: 32 }}>니쥬</span>
     </div>
+    <Box left={120} top={330} width={1680} style={{ display: 'grid', gap: 20 }}>
+      <DiffRow n="1" title="취향 발견부터 시작" before="원하는 걸 이미 안다고 전제" after={<>대화로 <Hl>취향부터 확정</Hl></>} />
+      <DiffRow n="2" title="추측이 아닌 확정된 취향" before="대화 맥락·설명으로 추측" after={<>친구가 <Hl>직접 확정한 취향</Hl></>} />
+      <DiffRow n="3" title="설명되는 추천" before="‘이 상품이 어떤지’ 요약" after={<><Hl>‘왜 나에게 맞는지’</Hl> 설명</>} />
+      <DiffRow n="4" title="관계를 고려한 설계" before="익명 확인 기능 0 / 6곳" after={<><Hl>숨기기</Hl> · <Hl>슬쩍 물어보기</Hl></>} />
+    </Box>
+    <SourceNote>2026년 11월까지의 공식 보도자료·기사 기준</SourceNote>
   </Slide>
 );
+
+/* ───────────────────────── 협업 방식 ─────────────────────────
+ * 템플릿: 흰 카드 3장 (캡처 + 번호 원 + 제목 + 설명) */
+
+const shotImg: CSSProperties = { display: 'block', width: '100%', height: '100%', objectFit: 'cover', objectPosition: '0% 0%' };
+
+const CollabCard = ({ n, kicker, title, media, children }: { n: string; kicker: string; title: ReactNode; media: ReactNode; children: ReactNode }) => (
+  <div style={{ ...card, height: 650, padding: 32, display: 'flex', flexDirection: 'column' }}>
+    <div style={{ height: 340, borderRadius: 20, overflow: 'hidden', background: '#F3F0E3' }}>{media}</div>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 18, marginTop: 32 }}>
+      <Num n={n} dark />
+      <div>
+        <div style={{ fontSize: 20, fontWeight: 700, color: muted }}>{kicker}</div>
+        <div style={{ fontSize: 34, fontWeight: 800, letterSpacing: track.display, lineHeight: 1.2 }}>{title}</div>
+      </div>
+    </div>
+    <P size={23} style={{ marginTop: 22 }}>
+      {children}
+    </P>
+  </div>
+);
+
+const KptShot = ({ src, label }: { src: string; label: string }) => (
+  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, objectFit: 'contain', objectPosition: '50% 50%' }}>
+    <img src={src} alt="" style={{ display: 'block', width: 200, height: 240, objectFit: 'contain', objectPosition: '50% 50%', borderRadius: 12, background: surface }} />
+    <span style={{ fontSize: 18, fontWeight: 800 }}>{label}</span>
+  </div>
+);
+
+const Collab: Page = () => (
+  <Slide>
+    <Head chapter="협업 방식" width={1680}>
+      말하고, 돌아보고, <Hl>기록하며</Hl> 일했습니다
+    </Head>
+    <SubLine>
+      디스코드로 매일 소통하고, 버전이 끝날 때마다 KPT로 회고하고, 해결한 문제는 기술 블로그로 남겼습니다.
+    </SubLine>
+    <Box left={120} top={340} width={1680} style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 30 }}>
+      <CollabCard
+        n="1"
+        kicker="소통 · Discord"
+        title="스택별 채널로 바로 묻고 답하기"
+        media={<img src={collabDiscord} alt="디스코드 소통방" style={shotImg} />}
+      >
+        fe-be, fe-ai, be-cloud처럼 <b style={{ color: 'var(--osd-text)' }}>스택 간에 채널</b>을 나눠 이슈를 모두가 볼수 있게 하였습니다.
+      </CollabCard>
+      <CollabCard
+        n="2"
+        kicker="회고 · KPT"
+        title="버전이 끝날 때마다 KPT 회고"
+        media={
+          <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20 }}>
+            <KptShot src={collabKptV1} label="V1 회고" />
+            <KptShot src={collabKptV2} label="V2 회고" />
+          </div>
+        } style={{ fontWeight: '700' }}
+      >
+        <b style={{ color: 'var(--osd-text)', fontWeight: '700' }}>Keep, Problem, Try를 통해 버전별 배포후에 회고를 남</b><span style={{ fontWeight: '700' }}>겼습니다.</span>
+      </CollabCard>
+      <CollabCard
+        n="3"
+        kicker="기록 · 기술 블로그"
+        title="Behind The NeedU"
+        media={
+          <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20 }}>
+            <KptShot src={collabBlog} label="아티클 목록" />
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+              <img src={collabBlogPost} alt="" style={{ display: 'block', width: 200, height: 240, objectFit: 'cover', objectPosition: '50% 50%', borderRadius: 12, background: surface, objectViewBox: 'inset(0% 29.39% 0% 25.97%)' }} />
+              <span style={{ fontSize: 18, fontWeight: 800 }}>아티클 본문</span>
+            </div>
+          </div>
+        }
+      >
+        {''}<b style={{ color: 'var(--osd-text)' }}>해결한 문제를 글로 남겨</b> 팀 전체가 공유했습니다.
+      </CollabCard>
+    </Box>
+  </Slide>
+);
+
+/* ───────────────────────── Q&A ───────────────────────── */
 
 const QnA: Page = () => (
   <Slide>
@@ -3320,9 +3884,9 @@ const QnA: Page = () => (
         <Pill dark>needu.gift</Pill>
       </div>
       <P size={24} style={{ marginTop: 32, lineHeight: 1.7 }}>
-        github.com/100-hours-a-week/KTB4-4th-AI
-        <br />
-        <Fill>팀 이메일, 블로그</Fill>
+        {''}
+        
+        <Fill>{''}</Fill>
         <br />
         카카오테크 부트캠프 Team 4주라
       </P>
@@ -3924,7 +4488,7 @@ const ink2 = '#555555';
 const barTone = {
   before: 'var(--osd-accent)',
   after: 'var(--osd-text)',
-  retry: 'repeating-linear-gradient(-45deg, #FEE500 0 9px, #FFF6B8 9px 18px)',
+  retry: `#FFF6B8 ${svgBg("<svg xmlns='http://www.w3.org/2000/svg' width='2000' height='200'><defs><pattern id='s' width='18' height='18' patternUnits='userSpaceOnUse' patternTransform='rotate(45)'><rect width='9' height='18' fill='#FEE500'/></pattern></defs><rect width='2000' height='200' fill='url(#s)'/></svg>")} 0 0 / 2000px 200px no-repeat`,
 } as const;
 
 /** 제목 아래 한 줄 설명 */
@@ -5577,7 +6141,7 @@ export const meta: SlideMeta = {
   createdAt: '2026-11-12T01:10:14.351Z',
 };
 
-export default [
+const pages = [
   Cover,
   Contents,
   // 01 프로젝트 팀 구성 및 역할
@@ -5589,8 +6153,8 @@ export default [
   GiftProblem,
   InfoGap,
   Answer,
-  // 03 프로젝트 수행 경과 (사용자 흐름별, 스택은 관여한 곳에만)
   Ch03,
+  // 03 프로젝트 수행 경과 (사용자 흐름별, 스택은 관여한 곳에만)
   FlowIntroA,
   // 흐름 A 메인 페이지
   FeMainFont,
@@ -5607,32 +6171,34 @@ export default [
   AiListIntent,
   AiListFallback,
   FeListQuery,
-  FeListLoading,
+  // FeListLoading, (FE 수정본에서 빠짐)
   FeListVirtual,
   // 흐름 A 메인 페이지 알림
   BeBatch,
   BePush,
   FlowIntroB,
+  AskFeature,
   // 트래픽을 버티는 방법 (CL)
   TrafficIntro,
   ClPools,
   ClValkey,
   ClCutover,
   ClVerify,
-  ClLimits,
+  // ClLimits, (클라우드 수정본에서 SLO는 31쪽으로 합쳐지고 한계 페이지는 빠짐)
   // 04 프로젝트 결과
   Ch04,
   Numbers,
   Trend,
-  Goals,
   // 05 활용방안 및 기대효과
   Ch05,
-  Utilization,
-  // 06 자체 평가 의견 및 후기
+  Expansion,
+  // 06 경쟁 서비스 비교
   Ch06,
-  Review,
+  CompAI,
+  CompNeeds,
+  CompDiff,
   // 마무리
-  Demo,
+  Collab,
   QnA,
   // 부록 A 아키텍처 (발표에서는 넘김)
   AppendixArch,
@@ -5659,8 +6225,6 @@ export default [
   BEPushCause,
   BEPushSolution,
   BEBatchResult,
-  BEBatchSummary,
-  BEDesign,
-  InfraCost,
-  InfraMonitoring,
 ] satisfies Page[];
+
+export default pages;
